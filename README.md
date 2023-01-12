@@ -1,3 +1,3 @@
 # CptS321-HWs
-# Molly Iverson
-# 11775649
+Molly Iverson
+11775649
