@@ -14,8 +14,14 @@ using System.Windows.Forms;
 
 namespace Spreadsheet_Molly_Iverson
 {
+    /// <summary>
+    /// Contains all interaction with the UI.
+    /// </summary>
     public partial class Form1 : Form
     {
+        /// <summary>
+        /// Initializes a new instance of the <see cref="Form1"/> class.
+        /// </summary>
         public Form1()
         {
             this.InitializeComponent();
@@ -28,6 +34,7 @@ namespace Spreadsheet_Molly_Iverson
         private void InitializeDataGrid()
         {
             this.dataGridView1.Columns.Clear();
+
             for (int i = 0; i < 26; i++)
             {
                 this.dataGridView1.Columns.Add("column" + i, char.ConvertFromUtf32(65 + i));
@@ -38,9 +45,12 @@ namespace Spreadsheet_Molly_Iverson
                 this.dataGridView1.Columns.Add("column" + (i + 26), "A" + char.ConvertFromUtf32(65 + i));
             }
 
-            for (int i = 0; i < 50; i++)
+            this.dataGridView1.Rows.Add(51);
+
+            // Adds the row indices to the spreadsheet
+            for (int i = 1; i < this.dataGridView1.Rows.Count; i++)
             {
-                this.dataGridView1.Rows.Add();
+                this.dataGridView1.Rows[i - 1].HeaderCell.Value = i.ToString();
             }
         }
     }
