@@ -32,20 +32,20 @@ namespace SpreadsheetEngine
         /// </summary>
         protected string value;
 
-        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
         /// <param name="rowIndex">The cell's row in the spreadsheet.</param>
         /// <param name="columnIndex">The cell's column in the spreadsheet.</param>
-        /// <param name="text">The data inside the cell.</param>
-        public Cell(int rowIndex, int columnIndex, string text)
+        public Cell(int rowIndex, int columnIndex)
         {
             this.rowIndex = rowIndex;
             this.columnIndex = columnIndex;
-            this.text = text;
+            this.text = string.Empty;
+            this.value = this.text;
         }
+
+        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         /// <summary>
         /// Gets the row index.
