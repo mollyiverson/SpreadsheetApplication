@@ -1,4 +1,8 @@
-﻿using System;
+﻿// <copyright file="Spreadsheet.cs" company="Molly Iverson:11775649">
+// Copyright (c) Molly Iverson:11775649. All rights reserved.
+// </copyright>
+
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
@@ -32,7 +36,7 @@ namespace SpreadsheetEngine
         /// </summary>
         /// <param name="rows">The number of rows in the spreadsheet.</param>
         /// <param name="columns">The number of columns in the spreadsheet.</param>
-        public Spreadsheet (int rows, int columns)
+        public Spreadsheet(int rows, int columns)
         {
             this.rows = rows;
             this.columns = columns;
@@ -59,6 +63,15 @@ namespace SpreadsheetEngine
             public SCell(int rowIndex, int columnIndex)
                 : base(rowIndex, columnIndex)
             {
+            }
+
+            /// <summary>
+            /// Gets or sets the evaluated value of the Cell.
+            /// </summary>
+            public new string Value
+            {
+                get { return this.Value; }
+                set { this.Value = value; }
             }
         }
     }

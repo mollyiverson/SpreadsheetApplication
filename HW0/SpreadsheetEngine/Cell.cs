@@ -45,6 +45,9 @@ namespace SpreadsheetEngine
             this.value = this.text;
         }
 
+        /// <summary>
+        /// 
+        /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         /// <summary>
@@ -90,10 +93,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public string Value
         {
-            get
-            {
-                return this.value;
-            }
+            get { return this.value; }
         }
     }
 }
