@@ -4,6 +4,7 @@
 
 using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
@@ -46,12 +47,21 @@ namespace SpreadsheetEngine
                 for (int j = 0; j < columns; j++)
                 {
                     this.spreadsheet[i, j] = new SCell(i, j);
+                    this.spreadsheet[i, j].PropertyChanged += SCell_PropertyChanged;
                 }
             }
         }
 
+        public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
+
+        private void SCell_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            CellPropertyChanged(sender, e);
+        }
+
         /// <summary>
-        /// A concrete cell class.
+        /// Represents a cell in the spreadsheet. This is a concrete derived class of the abstract
+        /// Cell class.
         /// </summary>
         private class SCell : Cell
         {

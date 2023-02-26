@@ -11,7 +11,6 @@ namespace SpreadsheetEngine
     /// </summary>
     public abstract class Cell : INotifyPropertyChanged
     {
-
         /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
@@ -21,7 +20,8 @@ namespace SpreadsheetEngine
         {
             this.RowIndex = rowIndex;
             this.ColumnIndex = columnIndex;
-            
+            this.Text = string.Empty;
+            this.Value = string.Empty;
         }
 
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
