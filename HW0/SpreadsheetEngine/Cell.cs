@@ -2,12 +2,14 @@
 // Copyright (c) Molly Iverson:11775649. All rights reserved.
 // </copyright>
 
+using System.ComponentModel;
+
 namespace SpreadsheetEngine
 {
     /// <summary>
     /// Represents one cell in the spreadsheet.
     /// </summary>
-    public abstract class Cell
+    public abstract class Cell : INotifyPropertyChanged
     {
         /// <summary>
         /// The Cell's row index in the spreadsheet.
@@ -23,6 +25,14 @@ namespace SpreadsheetEngine
         /// The text inside the spreadsheet cell.
         /// </summary>
         protected string text;
+
+        /// <summary>
+        /// Represents the “evaluated” value of the cell. It will just be the Text property if the
+        /// text doesn’t start with the ‘=’ character.
+        /// </summary>
+        protected string value;
+
+        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
@@ -58,8 +68,32 @@ namespace SpreadsheetEngine
         /// </summary>
         public string Text
         {
-            get { return this.text; }
-            set { this.text = value; }
+            get
+            {
+                return this.text;
+            }
+
+            set
+            {
+                if (value == this.text)
+                {
+                    return;
+                }
+
+                this.text = value;
+                PropertyChanged(this, new PropertyChangedEventArgs("Text"));
+            }
+        }
+
+        /// <summary>
+        /// Gets the evaluated value of the Cell.
+        /// </summary>
+        public string Value
+        {
+            get
+            {
+                return this.value;
+            }
         }
     }
 }
