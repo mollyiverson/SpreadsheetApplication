@@ -11,26 +11,6 @@ namespace SpreadsheetEngine
     /// </summary>
     public abstract class Cell : INotifyPropertyChanged
     {
-        /// <summary>
-        /// The Cell's row index in the spreadsheet.
-        /// </summary>
-        protected readonly int rowIndex;
-
-        /// <summary>
-        /// The Cell's column index in the spreadsheet.
-        /// </summary>
-        protected readonly int columnIndex;
-
-        /// <summary>
-        /// The text inside the spreadsheet cell.
-        /// </summary>
-        protected string text;
-
-        /// <summary>
-        /// Represents the “evaluated” value of the cell. It will just be the Text property if the
-        /// text doesn’t start with the ‘=’ character.
-        /// </summary>
-        protected string value;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
@@ -39,15 +19,11 @@ namespace SpreadsheetEngine
         /// <param name="columnIndex">The cell's column in the spreadsheet.</param>
         public Cell(int rowIndex, int columnIndex)
         {
-            this.rowIndex = rowIndex;
-            this.columnIndex = columnIndex;
-            this.text = string.Empty;
-            this.value = this.text;
+            this.RowIndex = rowIndex;
+            this.ColumnIndex = columnIndex;
+            
         }
 
-        /// <summary>
-        /// 
-        /// </summary>
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         /// <summary>
@@ -55,7 +31,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public int RowIndex
         {
-            get { return this.rowIndex; }
+            get;
         }
 
         /// <summary>
@@ -63,7 +39,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public int ColumnIndex
         {
-            get { return this.columnIndex; }
+            get;
         }
 
         /// <summary>
@@ -73,17 +49,17 @@ namespace SpreadsheetEngine
         {
             get
             {
-                return this.text;
+                return this.Text;
             }
 
             set
             {
-                if (value == this.text)
+                if (value == this.Text)
                 {
                     return;
                 }
 
-                this.text = value;
+                this.Text = value;
                 PropertyChanged(this, new PropertyChangedEventArgs("Text"));
             }
         }
@@ -93,7 +69,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public string Value
         {
-            get { return this.value; }
+            get;
         }
     }
 }
