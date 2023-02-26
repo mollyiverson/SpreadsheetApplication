@@ -16,15 +16,7 @@ namespace SpreadsheetEngine
     /// </summary>
     internal class Spreadsheet
     {
-        /// <summary>
-        /// The number of rows in the spreadsheet.
-        /// </summary>
-        private int rows;
-
-        /// <summary>
-        /// The number of columns in the spreadsheet.
-        /// </summary>
-        private int columns;
+        public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
 
         /// <summary>
         /// The 2D array of Cells that represents the spreadsheet.
@@ -39,8 +31,8 @@ namespace SpreadsheetEngine
         /// <param name="columns">The number of columns in the spreadsheet.</param>
         public Spreadsheet(int rows, int columns)
         {
-            this.rows = rows;
-            this.columns = columns;
+            this.RowCount = rows;
+            this.ColumnCount = columns;
             this.spreadsheet = new SCell[rows, columns];
             for (int i = 0; i < rows; i++)
             {
@@ -52,7 +44,33 @@ namespace SpreadsheetEngine
             }
         }
 
-        public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
+        /// <summary>
+        /// Gets the number of rows in the spreadsheet.
+        /// </summary>
+        public int RowCount
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Gets the number of columns in the spreadsheet.
+        /// </summary>
+        public int ColumnCount
+        {
+            get;
+        }
+
+        /// <summary>
+        /// Takes a row and column index and returns the cell at that location 
+        /// or null if there is no such cell.
+        /// </summary>
+        /// <param name="row">The row in the spreadsheet where the cell is.</param>
+        /// <param name="column">The column in the spreadsheet where the cell is.</param>
+        /// <returns>A cell in the spreadsheet.</returns>
+        public Cell GetCell(int row, int column)
+        {
+            return this.spreadsheet[row, column];
+        }
 
         private void SCell_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
