@@ -14,10 +14,8 @@ namespace SpreadsheetEngine
     /// <summary>
     /// Serves as the container for the 2D array of Cells.
     /// </summary>
-    internal class Spreadsheet
+    public class Spreadsheet
     {
-        public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
-
         /// <summary>
         /// The 2D array of Cells that represents the spreadsheet.
         /// </summary>
@@ -44,6 +42,8 @@ namespace SpreadsheetEngine
             }
         }
 
+        public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
+
         /// <summary>
         /// Gets the number of rows in the spreadsheet.
         /// </summary>
@@ -67,8 +67,13 @@ namespace SpreadsheetEngine
         /// <param name="row">The row in the spreadsheet where the cell is.</param>
         /// <param name="column">The column in the spreadsheet where the cell is.</param>
         /// <returns>A cell in the spreadsheet.</returns>
-        public Cell GetCell(int row, int column)
+        public Cell? GetCell(int row, int column)
         {
+            if (row > this.RowCount || column > this.ColumnCount)
+            {
+                return null;
+            }
+
             return this.spreadsheet[row, column];
         }
 
