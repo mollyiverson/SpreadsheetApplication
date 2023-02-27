@@ -19,7 +19,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// The 2D array of Cells that represents the spreadsheet.
         /// </summary>
-        private SCell[,] spreadsheet;
+        private Cell[,] spreadsheet;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
@@ -31,7 +31,7 @@ namespace SpreadsheetEngine
         {
             this.RowCount = rows;
             this.ColumnCount = columns;
-            this.spreadsheet = new SCell[rows, columns];
+            this.spreadsheet = new Cell[rows, columns];
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
@@ -69,7 +69,7 @@ namespace SpreadsheetEngine
         /// <returns>A cell in the spreadsheet.</returns>
         public Cell? GetCell(int row, int column)
         {
-            if (row > this.RowCount || column > this.ColumnCount)
+            if (row >= this.RowCount || column >= this.ColumnCount)
             {
                 return null;
             }

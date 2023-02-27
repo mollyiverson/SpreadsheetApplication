@@ -28,7 +28,6 @@ namespace SpreadsheetApplicationTests
         {
             Spreadsheet spreadsheet = new Spreadsheet(5, 5);
             Assert.That(spreadsheet.GetCell(6, 6), Is.EqualTo(null));
-            //Assert.Pass();
         }
     }
 }
