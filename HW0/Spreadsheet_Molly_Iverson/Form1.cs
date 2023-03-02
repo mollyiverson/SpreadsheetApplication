@@ -83,8 +83,33 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">Button is clicked event.</param>
         private void DemoButton_Click(object sender, EventArgs e)
         {
-            Cell currentCell = this.spreadsheet.GetCell(0, 0);
-            currentCell.Text = "Hello World!";
+            Random random = new Random();
+            for (int i = 0; i < 50; i++)
+            {
+                Cell currentCell = this.spreadsheet.GetCell(random.Next(0, 50), random.Next(0, 26));
+                if (currentCell != null)
+                {
+                    currentCell.Text = "Hello World!";
+                }
+            }
+
+            for (int i = 0; i < 50; i++)
+            {
+                Cell currentCell = this.spreadsheet.GetCell(i, 1);
+                if (currentCell != null)
+                {
+                    currentCell.Text = "This is cell B" + (i + 1);
+                }
+            }
+
+            for (int i = 0; i < 50; i++)
+            {
+                Cell currentCell = this.spreadsheet.GetCell(i, 0);
+                if (currentCell != null)
+                {
+                    currentCell.Text = "=B" + i;
+                }
+            }
         }
 
         /// <summary>

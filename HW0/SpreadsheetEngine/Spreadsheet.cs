@@ -110,13 +110,13 @@ namespace SpreadsheetEngine
                     else
                     {
                         // Get the letter column
-                        char column = currentCell.Text[1];
+                        char columnLetter = currentCell.Text[1];
 
                         // Get number of rows as a substring
                         string rows = currentCell.Text.Substring(2);
 
                         // Convert
-                        int columnIndex = column - 65;
+                        int columnIndex = columnLetter - 65;
                         int rowIndex = int.Parse(rows);
 
                         currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
