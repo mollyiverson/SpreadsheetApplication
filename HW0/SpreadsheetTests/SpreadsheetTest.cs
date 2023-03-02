@@ -11,8 +11,6 @@ namespace SpreadsheetApplicationTests
     /// </summary>
     public class SpreadsheetTest
     {
-        private Spreadsheet objectUnderTest = new Spreadsheet(5, 5);
-
         /// <summary>
         /// Sets up the tests.
         /// </summary>
@@ -31,6 +29,27 @@ namespace SpreadsheetApplicationTests
         {
             Spreadsheet spreadsheet = new Spreadsheet(5, 5);
             Assert.That(spreadsheet.GetCell(6, 6), Is.EqualTo(null));
+        }
+
+
+        /// <summary>
+        /// Normal Case: Tests if a Spreadsheet has the correct row count.
+        /// </summary>
+        [Test]
+        public void TestRows()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 7);
+            Assert.That(spreadsheet.RowCount, Is.EqualTo(5));
+        }
+
+        /// <summary>
+        /// Normal Case: Tests if a Spreadsheet has the correct column count.
+        /// </summary>
+        [Test]
+        public void TestColumns()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 7);
+            Assert.That(spreadsheet.ColumnCount, Is.EqualTo(7));
         }
     }
 }
