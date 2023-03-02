@@ -52,7 +52,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public int RowIndex
         {
-            get;
+            get { return this.rowIndex; }
         }
 
         /// <summary>
@@ -60,7 +60,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public int ColumnIndex
         {
-            get;
+            get { return this.columnIndex; }
         }
 
         /// <summary>
@@ -75,12 +75,12 @@ namespace SpreadsheetEngine
 
             set
             {
-                if (value == this.text)
+                if (this.text == value)
                 {
                     return;
                 }
 
-                this.Text = value;
+                this.text = value;
                 PropertyChanged(this, new PropertyChangedEventArgs("Text"));
             }
         }
@@ -90,7 +90,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public string Value
         {
-            get;
+            get { return this.value; }
         }
     }
 }

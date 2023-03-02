@@ -1,4 +1,4 @@
-﻿// <copyright file="Form1.cs" company="Molly Iverson:11775649">
+// <copyright file="Form1.cs" company="Molly Iverson:11775649">
 // Copyright (c) Molly Iverson:11775649. All rights reserved.
 // </copyright>
 
@@ -10,6 +10,7 @@ using System.Drawing;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using System.Timers;
 using System.Windows.Forms;
 using SpreadsheetEngine;
 
@@ -31,20 +32,25 @@ namespace Spreadsheet_Molly_Iverson
         public Form1()
         {
             this.InitializeComponent();
-
-            // HAVING ISSUE HERE: Can't instantiate spreadsheet without an error
-            this.spreadsheet = new Spreadsheet(50, 50);
-            //this.spreadsheet.CellPropertyChanged += this.Spreadsheet_PropertyChanged;
+            this.spreadsheet = new Spreadsheet(50, 26);
+            this.spreadsheet.CellPropertyChanged += this.Spreadsheet_PropertyChanged;
             this.InitializeDataGrid();
         }
 
         private void Spreadsheet_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            Cell currentCell = sender as Cell;
+
+            int row = currentCell.RowIndex;
+            int column = currentCell.ColumnIndex;
+
             if (e.PropertyName == "Text")
             {
-                this.dataGridView1[3, 3].Value = "HELLO";
+                this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
+                this.dataGridView1[row, column].Value = currentCell.Text;
             }
         }
+
 
         /// <summary>
         /// Sets up the DataGrid by adding the columns and rows.
@@ -58,11 +64,6 @@ namespace Spreadsheet_Molly_Iverson
                 this.dataGridView1.Columns.Add("column" + i, char.ConvertFromUtf32(65 + i));
             }
 
-            for (int i = 0; i < 26; i++)
-            {
-                this.dataGridView1.Columns.Add("column" + (i + 26), "A" + char.ConvertFromUtf32(65 + i));
-            }
-
             this.dataGridView1.Rows.Add(51);
 
             // Adds the row indices to the spreadsheet
@@ -70,6 +71,20 @@ namespace Spreadsheet_Molly_Iverson
             {
                 this.dataGridView1.Rows[i - 1].HeaderCell.Value = i.ToString();
             }
+        }
+
+        /// <summary>
+        /// The demo runs when the user presses this button.
+        /// </summary>
+        /// <param name="sender">The button.</param>
+        /// <param name="e">Button is clicked event.</param>
+        private void DemoButton_Click(object sender, EventArgs e)
+        {
+            Cell currentCell = this.spreadsheet.GetCell(0, 0);
+            currentCell.Text = "Hello World!";
+
+
+
         }
     }
 }

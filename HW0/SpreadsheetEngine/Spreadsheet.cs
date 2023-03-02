@@ -19,7 +19,17 @@ namespace SpreadsheetEngine
         /// <summary>
         /// The 2D array of Cells that represents the spreadsheet.
         /// </summary>
-        private Cell[,] cellArray;
+        private SCell[,] cellArray;
+
+        /// <summary>
+        /// The number of rows in the spreadsheet.
+        /// </summary>
+        private int rowCount;
+
+        /// <summary>
+        /// The number of columns in the spreadsheet.
+        /// </summary>
+        private int columnCount;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
@@ -29,8 +39,8 @@ namespace SpreadsheetEngine
         /// <param name="columns">The number of columns in the spreadsheet.</param>
         public Spreadsheet(int rows, int columns)
         {
-            this.RowCount = rows;
-            this.ColumnCount = columns;
+            this.rowCount = rows;
+            this.columnCount = columns;
             this.cellArray = new SCell[rows, columns];
             for (int i = 0; i < rows; i++)
             {
@@ -49,7 +59,7 @@ namespace SpreadsheetEngine
         /// </summary>
         public int RowCount
         {
-            get;
+            get { return this.rowCount; }
         }
 
         /// <summary>
@@ -57,11 +67,11 @@ namespace SpreadsheetEngine
         /// </summary>
         public int ColumnCount
         {
-            get;
+            get { return this.columnCount; }
         }
 
         /// <summary>
-        /// Takes a row and column index and returns the cell at that location 
+        /// Takes a row and column index and returns the cell at that location
         /// or null if there is no such cell.
         /// </summary>
         /// <param name="row">The row in the spreadsheet where the cell is.</param>
@@ -79,8 +89,23 @@ namespace SpreadsheetEngine
 
         private void SCell_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
+            if (e.PropertyName == "Text")
+            {
+                SCell currentCell = sender as SCell;
+
+                if (currentCell.Text[0] != '=')
+                {
+                    currentCell.Value = currentCell.Text;
+                }
+                else
+                {
+                    // get value formula TO DO
+                }
+            }
+
             CellPropertyChanged(sender, e);
         }
+
 
         /// <summary>
         /// Represents a cell in the spreadsheet. This is a concrete derived class of the abstract
@@ -103,8 +128,8 @@ namespace SpreadsheetEngine
             /// </summary>
             public new string Value
             {
-                get { return this.Value; }
-                set { this.Value = value; }
+                get { return this.value; }
+                set { this.value = value; }
             }
         }
     }
