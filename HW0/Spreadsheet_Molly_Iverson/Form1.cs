@@ -37,6 +37,11 @@ namespace Spreadsheet_Molly_Iverson
             this.InitializeDataGrid();
         }
 
+        /// <summary>
+        /// The event if any cell in the spreadsheet is changed.
+        /// </summary>
+        /// <param name="sender">Cell changed.</param>
+        /// <param name="e">Cell property changed event.</param>
         private void Spreadsheet_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
             Cell currentCell = sender as Cell;
@@ -47,10 +52,8 @@ namespace Spreadsheet_Molly_Iverson
             if (e.PropertyName == "Text")
             {
                 this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
-                this.dataGridView1[row, column].Value = currentCell.Text;
             }
         }
-
 
         /// <summary>
         /// Sets up the DataGrid by adding the columns and rows.
@@ -82,9 +85,15 @@ namespace Spreadsheet_Molly_Iverson
         {
             Cell currentCell = this.spreadsheet.GetCell(0, 0);
             currentCell.Text = "Hello World!";
+        }
 
-
-
+        /// <summary>
+        /// This event is called when a cell in the datagrid is clicked.
+        /// </summary>
+        /// <param name="sender">Datagrid.</param>
+        /// <param name="e">Cell is clicked.</param>
+        private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        {
         }
     }
 }

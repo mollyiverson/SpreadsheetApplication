@@ -47,11 +47,14 @@ namespace SpreadsheetEngine
                 for (int j = 0; j < columns; j++)
                 {
                     this.cellArray[i, j] = new SCell(i, j);
-                    this.cellArray[i, j].PropertyChanged += SCell_PropertyChanged;
+                    this.cellArray[i, j].PropertyChanged += this.SCell_PropertyChanged;
                 }
             }
         }
 
+        /// <summary>
+        /// This event handler notifies the Form when a cell has changed.
+        /// </summary>
         public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
 
         /// <summary>
@@ -87,25 +90,42 @@ namespace SpreadsheetEngine
             return this.cellArray[row, column];
         }
 
+        /// <summary>
+        /// The event where a cell in the spreadsheet is modified.
+        /// </summary>
+        /// <param name="sender">Cell changed.</param>
+        /// <param name="e">Event where cell is changed.</param>
         private void SCell_PropertyChanged(object sender, PropertyChangedEventArgs e)
         {
-            if (e.PropertyName == "Text")
+            SCell? currentCell = sender as SCell;
+
+            if (currentCell != null)
             {
-                SCell currentCell = sender as SCell;
+                if (e.PropertyName == "Text")
+                {
+                    if (currentCell.Text[0] != '=')
+                    {
+                        currentCell.Value = currentCell.Text;
+                    }
+                    else
+                    {
+                        // Get the letter column
+                        char column = currentCell.Text[1];
 
-                if (currentCell.Text[0] != '=')
-                {
-                    currentCell.Value = currentCell.Text;
+                        // Get number of rows as a substring
+                        string rows = currentCell.Text.Substring(2);
+
+                        // Convert
+                        int columnIndex = column - 65;
+                        int rowIndex = int.Parse(rows);
+
+                        currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
+                    }
                 }
-                else
-                {
-                    // get value formula TO DO
-                }
+
+                this.CellPropertyChanged(sender, e);
             }
-
-            CellPropertyChanged(sender, e);
         }
-
 
         /// <summary>
         /// Represents a cell in the spreadsheet. This is a concrete derived class of the abstract
