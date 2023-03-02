@@ -19,7 +19,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// The 2D array of Cells that represents the spreadsheet.
         /// </summary>
-        private Cell[,] spreadsheet;
+        private Cell[,] cellArray;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
@@ -31,13 +31,13 @@ namespace SpreadsheetEngine
         {
             this.RowCount = rows;
             this.ColumnCount = columns;
-            this.spreadsheet = new Cell[rows, columns];
+            this.cellArray = new SCell[rows, columns];
             for (int i = 0; i < rows; i++)
             {
                 for (int j = 0; j < columns; j++)
                 {
-                    this.spreadsheet[i, j] = new SCell(i, j);
-                    this.spreadsheet[i, j].PropertyChanged += SCell_PropertyChanged;
+                    this.cellArray[i, j] = new SCell(i, j);
+                    this.cellArray[i, j].PropertyChanged += SCell_PropertyChanged;
                 }
             }
         }
@@ -74,7 +74,7 @@ namespace SpreadsheetEngine
                 return null;
             }
 
-            return this.spreadsheet[row, column];
+            return this.cellArray[row, column];
         }
 
         private void SCell_PropertyChanged(object sender, PropertyChangedEventArgs e)

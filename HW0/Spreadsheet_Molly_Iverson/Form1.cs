@@ -11,6 +11,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using SpreadsheetEngine;
 
 namespace Spreadsheet_Molly_Iverson
 {
@@ -20,12 +21,29 @@ namespace Spreadsheet_Molly_Iverson
     public partial class Form1 : Form
     {
         /// <summary>
+        /// Represents the logic behind the UI spreadsheet.
+        /// </summary>
+        private Spreadsheet spreadsheet;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Form1"/> class.
         /// </summary>
         public Form1()
         {
             this.InitializeComponent();
+
+            // HAVING ISSUE HERE: Can't instantiate spreadsheet without an error
+            this.spreadsheet = new Spreadsheet(50, 50);
+            //this.spreadsheet.CellPropertyChanged += this.Spreadsheet_PropertyChanged;
             this.InitializeDataGrid();
+        }
+
+        private void Spreadsheet_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        {
+            if (e.PropertyName == "Text")
+            {
+                this.dataGridView1[3, 3].Value = "HELLO";
+            }
         }
 
         /// <summary>
