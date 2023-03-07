@@ -48,7 +48,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// This event handler notifies the Spreadsheet when this cell has been modified.
         /// </summary>
-        public event PropertyChangedEventHandler PropertyChanged = delegate { };
+        public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         /// <summary>
         /// Gets the row index.
@@ -84,7 +84,10 @@ namespace SpreadsheetEngine
                 }
 
                 this.text = value;
-                this.PropertyChanged(this, new PropertyChangedEventArgs("Text"));
+                if (this.PropertyChanged != null)
+                {
+                    this.PropertyChanged(this, new PropertyChangedEventArgs("Text"));
+                }
             }
         }
 

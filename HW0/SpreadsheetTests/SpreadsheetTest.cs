@@ -31,7 +31,6 @@ namespace SpreadsheetApplicationTests
             Assert.That(spreadsheet.GetCell(6, 6), Is.EqualTo(null));
         }
 
-
         /// <summary>
         /// Normal Case: Tests if a Spreadsheet has the correct row count.
         /// </summary>

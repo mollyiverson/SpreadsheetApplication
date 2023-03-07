@@ -55,7 +55,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// This event handler notifies the Form when a cell has changed.
         /// </summary>
-        public event PropertyChangedEventHandler? CellPropertyChanged = delegate { };
+        public event PropertyChangedEventHandler CellPropertyChanged = delegate { };
 
         /// <summary>
         /// Gets the number of rows in the spreadsheet.
@@ -95,7 +95,7 @@ namespace SpreadsheetEngine
         /// </summary>
         /// <param name="sender">Cell changed.</param>
         /// <param name="e">Event where cell is changed.</param>
-        private void SCell_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void SCell_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
             SCell? currentCell = sender as SCell;
 

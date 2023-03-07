@@ -42,16 +42,19 @@ namespace Spreadsheet_Molly_Iverson
         /// </summary>
         /// <param name="sender">Cell changed.</param>
         /// <param name="e">Cell property changed event.</param>
-        private void Spreadsheet_PropertyChanged(object sender, PropertyChangedEventArgs e)
+        private void Spreadsheet_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            Cell currentCell = sender as Cell;
+            Cell? currentCell = sender as Cell;
 
-            int row = currentCell.RowIndex;
-            int column = currentCell.ColumnIndex;
-
-            if (e.PropertyName == "Text")
+            if (currentCell != null)
             {
-                this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
+                int row = currentCell.RowIndex;
+                int column = currentCell.ColumnIndex;
+
+                if (e.PropertyName == "Text")
+                {
+                    this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
+                }
             }
         }
 
@@ -86,7 +89,7 @@ namespace Spreadsheet_Molly_Iverson
             Random random = new Random();
             for (int i = 0; i < 50; i++)
             {
-                Cell currentCell = this.spreadsheet.GetCell(random.Next(0, 50), random.Next(0, 26));
+                Cell? currentCell = this.spreadsheet.GetCell(random.Next(0, 50), random.Next(0, 26));
                 if (currentCell != null)
                 {
                     currentCell.Text = "Hello World!";
@@ -95,7 +98,7 @@ namespace Spreadsheet_Molly_Iverson
 
             for (int i = 0; i < 50; i++)
             {
-                Cell currentCell = this.spreadsheet.GetCell(i, 1);
+                Cell? currentCell = this.spreadsheet.GetCell(i, 1);
                 if (currentCell != null)
                 {
                     currentCell.Text = "This is cell B" + (i + 1);
@@ -104,7 +107,7 @@ namespace Spreadsheet_Molly_Iverson
 
             for (int i = 0; i < 50; i++)
             {
-                Cell currentCell = this.spreadsheet.GetCell(i, 0);
+                Cell? currentCell = this.spreadsheet.GetCell(i, 0);
                 if (currentCell != null)
                 {
                     currentCell.Text = "=B" + i;
@@ -117,7 +120,7 @@ namespace Spreadsheet_Molly_Iverson
         /// </summary>
         /// <param name="sender">Datagrid.</param>
         /// <param name="e">Cell is clicked.</param>
-        private void DataGridView1_CellContentClick(object sender, DataGridViewCellEventArgs e)
+        private void DataGridView1_CellContentClick(object? sender, DataGridViewCellEventArgs e)
         {
         }
     }
