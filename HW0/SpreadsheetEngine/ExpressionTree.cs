@@ -28,8 +28,8 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Sets the specified variable within the ExpressionTree variables dictionary.
         /// </summary>
-        /// <param name="variableName"></param>
-        /// <param name="variableValue"></param>
+        /// <param name="variableName">The name of the variable.</param>
+        /// <param name="variableValue">The value of the variable.</param>
         public void SetVariable(string variableName, double variableValue)
         {
         }
