@@ -18,11 +18,26 @@ namespace SpreadsheetEngine
     public class ExpressionTree
     {
         /// <summary>
+        /// A mathematical expression containing constants, variables and/or operators.
+        /// </summary>
+        private string expression;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         /// <param name="expression">The math expression with variables, operators, and constants.</param>
         public ExpressionTree(string expression)
         {
+            this.expression = expression;
+        }
+
+        /// <summary>
+        /// Gets or sets the mathematic expression.
+        /// </summary>
+        public string Expression
+        {
+            get { return this.expression; }
+            set { this.expression = value; }
         }
 
         /// <summary>
