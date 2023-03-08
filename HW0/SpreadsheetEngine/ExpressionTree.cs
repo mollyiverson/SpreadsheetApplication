@@ -3,6 +3,7 @@
 // </copyright>
 
 using System;
+using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Linq.Expressions;
@@ -23,12 +24,18 @@ namespace SpreadsheetEngine
         private string expression;
 
         /// <summary>
+        /// Contains all the variables and their values.
+        /// </summary>
+        private Hashtable variableTable;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         /// <param name="expression">The math expression with variables, operators, and constants.</param>
         public ExpressionTree(string expression)
         {
             this.expression = expression;
+            this.variableTable = new Hashtable();
         }
 
         /// <summary>
@@ -47,6 +54,7 @@ namespace SpreadsheetEngine
         /// <param name="variableValue">The value of the variable.</param>
         public void SetVariable(string variableName, double variableValue)
         {
+            this.variableTable[variableName] = variableValue;
         }
 
         /// <summary>
