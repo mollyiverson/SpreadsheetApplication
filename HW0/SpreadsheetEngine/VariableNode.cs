@@ -21,13 +21,20 @@ namespace SpreadsheetEngine
         private string name;
 
         /// <summary>
+        /// The value of the variable.
+        /// </summary>
+        private double value;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="VariableNode"/> class.
         /// Constructs a variable node.
         /// </summary>
         /// <param name="variableName">The name of the variable.</param>
-        public VariableNode(string variableName)
+        /// <param name="value">The value of the variable.</param>
+        public VariableNode(string variableName, double value)
         {
             this.name = variableName;
+            this.value = value;
         }
 
         /// <summary>
@@ -37,6 +44,16 @@ namespace SpreadsheetEngine
         {
             get { return this.name; }
             set { this.name = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the value of the variable.
+        /// </summary>
+        public double Value
+        {
+            get { return this.value; }
+            set { this.value = value; }
+
         }
 
         /// <summary>
