@@ -21,8 +21,8 @@ namespace SpreadsheetEngine
         /// <param name="c">The operator symbol.</param>
         /// <param name="left">The node left of the operator.</param>
         /// <param name="right">The node right of the operator.</param>
-        public SubtractionOperatorNode(char c, Node left, Node right)
-            : base(c, left, right)
+        public SubtractionOperatorNode(char c)
+            : base(c)
         {
             this.precedence = 4;
         }

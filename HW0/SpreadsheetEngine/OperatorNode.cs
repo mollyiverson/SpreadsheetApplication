@@ -41,11 +41,11 @@ namespace SpreadsheetEngine
         /// <param name="c">Operation character.</param>
         /// <param name="left">Left node.</param>
         /// <param name="right">Right node.</param>
-        public OperatorNode(char c, Node left, Node right)
+        public OperatorNode(char c)
         {
             this.operatorSymbol = c;
-            this.left = left;
-            this.right = right;
+            this.left = null;
+            this.right = null;
         }
 
         /// <summary>

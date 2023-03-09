@@ -19,9 +19,7 @@ namespace SpreadsheetEngine
         /// Initializes a new instance of the <see cref="AdditionOperatorNode"/> class.
         /// </summary>
         /// <param name="c">The operator symbol.</param>
-        /// <param name="left">The node left of the operator.</param>
-        /// <param name="right">The node right of the operator.</param>
-        public AdditionOperatorNode(char c, Node left, Node right)
+        public AdditionOperatorNode(char c)
             : base(c, left, right)
         {
             this.precedence = 3;

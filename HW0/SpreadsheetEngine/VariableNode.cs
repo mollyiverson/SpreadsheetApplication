@@ -62,8 +62,7 @@ namespace SpreadsheetEngine
         /// <returns>Variable value.</returns>
         public override double Evaluate()
         {
-            // Not implemented.
-            return 0;
+            return this.value;
         }
     }
 }
