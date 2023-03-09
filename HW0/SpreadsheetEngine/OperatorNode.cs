@@ -23,12 +23,12 @@ namespace SpreadsheetEngine
         /// <summary>
         /// The node to the left of the operator.
         /// </summary>
-        protected Node left;
+        protected Node? left;
 
         /// <summary>
         /// The node to the right of the operator.
         /// </summary>
-        protected Node right;
+        protected Node? right;
 
         /// <summary>
         /// The rank of the operator in terms of precedence. Used to determine what operator to perform first.
@@ -39,12 +39,10 @@ namespace SpreadsheetEngine
         /// Initializes a new instance of the <see cref="OperatorNode"/> class.
         /// </summary>
         /// <param name="c">Operation character.</param>
-        /// <param name="left">Left node.</param>
-        /// <param name="right">Right node.</param>
         public OperatorNode(char c)
         {
             this.operatorSymbol = c;
-            this.left = null;
+            this.left = new ConstantNode(0);
             this.right = null;
         }
 
@@ -60,7 +58,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the node left of the operator.
         /// </summary>
-        public Node Left
+        public Node? Left
         {
             get { return this.left; }
             set { this.left = value; }
@@ -69,7 +67,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the node right of the operator.
         /// </summary>
-        public Node Right
+        public Node? Right
         {
             get { return this.right; }
             set { this.right = value; }

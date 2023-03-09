@@ -19,8 +19,6 @@ namespace SpreadsheetEngine
         /// Initializes a new instance of the <see cref="MultiplicationOperatorNode"/> class.
         /// </summary>
         /// <param name="c">The operator symbol.</param>
-        /// <param name="left">The node left of the operator.</param>
-        /// <param name="right">The node right of the operator.</param>
         public MultiplicationOperatorNode(char c)
             : base(c)
         {
@@ -33,7 +31,14 @@ namespace SpreadsheetEngine
         /// <returns>The result.</returns>
         public override double Evaluate()
         {
-            return this.left.Evaluate() * this.right.Evaluate();
+            if (this.left != null && this.right != null)
+            {
+                return this.left.Evaluate() * this.right.Evaluate();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

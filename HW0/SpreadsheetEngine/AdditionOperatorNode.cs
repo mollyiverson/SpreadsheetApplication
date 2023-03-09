@@ -20,7 +20,7 @@ namespace SpreadsheetEngine
         /// </summary>
         /// <param name="c">The operator symbol.</param>
         public AdditionOperatorNode(char c)
-            : base(c, left, right)
+            : base(c)
         {
             this.precedence = 3;
         }
@@ -31,7 +31,14 @@ namespace SpreadsheetEngine
         /// <returns>The result.</returns>
         public override double Evaluate()
         {
-            return this.left.Evaluate() + this.right.Evaluate();
+            if (this.left != null && this.right != null)
+            {
+                return this.left.Evaluate() + this.right.Evaluate();
+            }
+            else
+            {
+                throw new NotImplementedException();
+            }
         }
     }
 }

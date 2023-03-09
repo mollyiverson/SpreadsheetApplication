@@ -21,6 +21,15 @@ namespace SpreadsheetEngine
         private double value;
 
         /// <summary>
+        /// Initializes a new instance of the <see cref="ConstantNode"/> class.
+        /// </summary>
+        /// <param name="value">A constant decimal value.</param>
+        public ConstantNode(double value)
+        {
+            this.value = value;
+        }
+
+        /// <summary>
         /// Gets or sets the constant value of the node.
         /// </summary>
         public double Value
