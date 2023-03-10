@@ -36,6 +36,11 @@ namespace SpreadsheetEngine
         protected int precedence;
 
         /// <summary>
+        /// Represents whether the operator is right, left, or nonassociated.
+        /// </summary>
+        protected string association;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="OperatorNode"/> class.
         /// </summary>
         /// <param name="c">Operation character.</param>

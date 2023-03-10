@@ -23,6 +23,7 @@ namespace SpreadsheetEngine
             : base(c)
         {
             this.precedence = 1;
+            this.association = "left";
         }
 
         /// <summary>

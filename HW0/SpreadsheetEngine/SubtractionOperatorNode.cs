@@ -23,7 +23,8 @@ namespace SpreadsheetEngine
             : base(c)
         {
             this.precedence = 4;
-        }
+            this.association = "left";
+                    }
 
         /// <summary>
         /// Subtracts two nodes from each other.
