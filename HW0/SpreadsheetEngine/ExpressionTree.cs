@@ -72,7 +72,7 @@ namespace SpreadsheetEngine
         /// <returns>The answer.</returns>
         public double Evaluate()
         {
-            string postfixExpression = this.ConvertToPostfix(this.expression);
+            string postfixExpression = ConvertToPostfix(this.expression);
             this.root = this.ConvertPostfixToTree(postfixExpression);
 
             if (this.root == null)
@@ -84,11 +84,40 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Determines if a character is a valid operator.
+        /// </summary>
+        /// <param name="op">Operator.</param>
+        /// <returns>Whether the operator is valid.</returns>
+        private static bool IsOperator(char op)
+        {
+            return OperatorNodeFactory.Operators.Contains(op);
+        }
+
+        /// <summary>
+        /// Determines if a character is alphanumeric.
+        /// </summary>
+        /// <param name="character">A char.</param>
+        /// <returns>Whether the character is alphanumeric.</returns>
+        private static bool IsAlphaNumeric(char character)
+        {
+            // If character is in the letter or number range.
+            if ((character >= 65 && character <= 90) || (character >= 97 && character <= 122)
+                || (character >= 48 && character <= 57))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Converts the regular mathematical expression to postfix format.
         /// </summary>
         /// <param name="expression">A mathematical expression.</param>
         /// <returns>The expression in postfix format.</returns>
-        private string ConvertToPostfix(string expression)
+        private static string ConvertToPostfix(string expression)
         {
             Stack<char> operatorStack = new Stack<char>();
             StringBuilder postfixString = new StringBuilder();
@@ -98,9 +127,9 @@ namespace SpreadsheetEngine
             while (index < expression.Length)
             {
                 // If character is an operator
-                if (this.IsOperator(expression[index]))
+                if (IsOperator(expression[index]))
                 {
-                    postfixString.Append(" ");
+                    postfixString.Append(' ');
                     OperatorNode currentOperator = OperatorNodeFactory.CreateOperatorNode(expression[index]);
 
                     if (operatorStack.Count > 0)
@@ -112,8 +141,8 @@ namespace SpreadsheetEngine
                         while (operatorStack.Count > 0 && nextOperatorNode.Precedence >= currentOperator.Precedence)
                         {
                             nextOperator = operatorStack.Pop();
-                            postfixString.Append(nextOperator.ToString());
-                            postfixString.Append(" ");
+                            postfixString.Append(nextOperator);
+                            postfixString.Append(' ');
 
                             if (operatorStack.Count != 0)
                             {
@@ -129,7 +158,7 @@ namespace SpreadsheetEngine
                 // Character is alphanumeric.
                 else
                 {
-                    if (!(this.IsAlphaNumeric(expression[index]) || expression[index] == '.'))
+                    if (!(IsAlphaNumeric(expression[index]) || expression[index] == '.'))
                     {
                         throw new System.Collections.Generic.KeyNotFoundException();
                     }
@@ -165,7 +194,7 @@ namespace SpreadsheetEngine
 
             foreach (var element in elements)
             {
-                if (this.IsOperator(element[0]))
+                if (IsOperator(element[0]))
                 {
                     // We need an Operator Node
                     Node rightOperand = nodeStack.Pop();
@@ -187,9 +216,9 @@ namespace SpreadsheetEngine
                     else
                     {
                         // We need a VariableNode
-                        if (this.variableTable.ContainsKey(element))
+                        if (this.variableTable.TryGetValue(element, out double value))
                         {
-                            VariableNode variableNode = new VariableNode(element, this.variableTable[element]);
+                            VariableNode variableNode = new VariableNode(element, value);
                             nodeStack.Push(variableNode);
                         }
                         else
@@ -201,35 +230,6 @@ namespace SpreadsheetEngine
             }
 
             return nodeStack.Pop();
-        }
-
-        /// <summary>
-        /// Determines if a character is a valid operator.
-        /// </summary>
-        /// <param name="op">Operator.</param>
-        /// <returns>Whether the operator is valid.</returns>
-        private bool IsOperator(char op)
-        {
-            return OperatorNodeFactory.Operators.Contains(op);
-        }
-
-        /// <summary>
-        /// Determines if a character is alphanumeric.
-        /// </summary>
-        /// <param name="character">A char.</param>
-        /// <returns>Whether the character is alphanumeric.</returns>
-        private bool IsAlphaNumeric(char character)
-        {
-            // If character is in the letter or number range.
-            if ((character >= 65 && character <= 90) || (character >= 97 && character <= 122)
-                || (character >= 48 && character <= 57))
-            {
-                return true;
-            }
-            else
-            {
-                return false;
-            }
         }
     }
 }

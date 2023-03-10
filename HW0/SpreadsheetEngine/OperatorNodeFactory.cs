@@ -20,7 +20,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// The implemented operators in the ExpressionTreeCalculator.
         /// </summary>
-        public static char[] Operators = { '+', '-', '/', '*' };
+        public static readonly char[] Operators = { '+', '-', '/', '*' };
 
         /// <summary>
         /// Returns the correct type of OperatorNode.
