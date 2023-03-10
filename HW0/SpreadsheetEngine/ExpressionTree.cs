@@ -10,6 +10,7 @@ using System.Linq.Expressions;
 using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml.Linq;
 using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SpreadsheetEngine
@@ -43,6 +44,7 @@ namespace SpreadsheetEngine
         {
             this.expression = expression;
             this.variableTable = new Dictionary<string, double>();
+            this.root = null;
         }
 
         /// <summary>
@@ -70,9 +72,8 @@ namespace SpreadsheetEngine
         /// <returns>The answer.</returns>
         public double Evaluate()
         {
-            Console.WriteLine(this.ConvertToPostfix("A+B*C-D"));
-            ConvertPostfixToNodes(ConvertToPostfix("A+B*C-D"));
-            return 0.0;
+            this.root = this.ConvertPostfixToTree(this.expression);
+
             if (this.root == null)
             {
                 throw new ArgumentNullException(nameof(this.root));
@@ -96,7 +97,7 @@ namespace SpreadsheetEngine
             while (index < expression.Length)
             {
                 // If character is an operator
-                if (OperatorNodeFactory.Operators.Contains(expression[index]))
+                if (this.IsOperator(expression[index]))
                 {
                     postfixString.Append(" ");
                     OperatorNode currentOperator = OperatorNodeFactory.CreateOperatorNode(expression[index]);
@@ -139,6 +140,71 @@ namespace SpreadsheetEngine
             }
 
             return postfixString.ToString();
+        }
+
+        /// <summary>
+        /// Converts a Postfix expression into an ExpressionTree.
+        /// </summary>
+        /// <param name="postfixString">A mathematical expression in postfix form.</param>
+        /// <returns>ExpressionTree.</returns>
+        private Node? ConvertPostfixToTree(string postfixString)
+        {
+            string[] elements = postfixString.Split(' ');
+            if (string.IsNullOrEmpty(postfixString))
+            {
+                return null;
+            }
+
+            Stack<Node> nodeStack = new Stack<Node>();
+
+            foreach (var element in elements)
+            {
+                if (this.IsOperator(element[0]))
+                {
+                    // We need an Operator Node
+                    Node rightOperand = nodeStack.Pop();
+                    Node leftOperand = nodeStack.Pop();
+                    OperatorNode operatorNode = OperatorNodeFactory.CreateOperatorNode(element[0]);
+                    operatorNode.Left = leftOperand;
+                    operatorNode.Right = rightOperand;
+                    nodeStack.Push(operatorNode);
+                }
+                else
+                {
+                    double number;
+                    if (double.TryParse(element, out number))
+                    {
+                        // We need a ConstantNode
+                        ConstantNode constantNode = new ConstantNode(number);
+                        nodeStack.Push(constantNode);
+                    }
+                    else
+                    {
+                        // We need a VariableNode
+                        if (this.variableTable.ContainsKey(element))
+                        {
+                            VariableNode variableNode = new VariableNode(element, this.variableTable[element]);
+                            nodeStack.Push(variableNode);
+                        }
+                        else
+                        {
+                            throw new Exception("The variable " + element + " has not been defined.");
+                        }
+                    }
+                }
+            }
+
+            return nodeStack.Pop();
+        }
+
+        /// <summary>
+        /// Determines if a character is a valid operator.
+        /// </summary>
+        /// <param name="op">Operator.</param>
+        /// <returns>Whether the operator is valid.</returns>
+        private bool IsOperator(char op)
+        {
+            return OperatorNodeFactory.Operators.Contains(op);
         }
     }
 }
