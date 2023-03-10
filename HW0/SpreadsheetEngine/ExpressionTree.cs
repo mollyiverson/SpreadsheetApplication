@@ -72,7 +72,8 @@ namespace SpreadsheetEngine
         /// <returns>The answer.</returns>
         public double Evaluate()
         {
-            this.root = this.ConvertPostfixToTree(this.expression);
+            string postfixExpression = this.ConvertToPostfix(this.expression);
+            this.root = this.ConvertPostfixToTree(postfixExpression);
 
             if (this.root == null)
             {
@@ -125,9 +126,14 @@ namespace SpreadsheetEngine
                     operatorStack.Push(expression[index]);
                 }
 
-                // Character is alphanumeric. Assuming valid input.
+                // Character is alphanumeric.
                 else
                 {
+                    if (!(this.IsAlphaNumeric(expression[index]) || expression[index] == '.'))
+                    {
+                        throw new System.Collections.Generic.KeyNotFoundException();
+                    }
+
                     postfixString.Append(expression[index]);
                 }
 
@@ -205,6 +211,25 @@ namespace SpreadsheetEngine
         private bool IsOperator(char op)
         {
             return OperatorNodeFactory.Operators.Contains(op);
+        }
+
+        /// <summary>
+        /// Determines if a character is alphanumeric.
+        /// </summary>
+        /// <param name="character">A char.</param>
+        /// <returns>Whether the character is alphanumeric.</returns>
+        private bool IsAlphaNumeric(char character)
+        {
+            // If character is in the letter or number range.
+            if ((character >= 65 && character <= 90) || (character >= 97 && character <= 122)
+                || (character >= 48 && character <= 57))
+            {
+                return true;
+            }
+            else
+            {
+                return false;
+            }
         }
     }
 }
