@@ -22,7 +22,7 @@ namespace SpreadsheetEngine
         public DivisionOperatorNode(char c)
             : base(c)
         {
-            this.precedence = 2;
+            this.precedence = 3;
             this.association = "left";
         }
 

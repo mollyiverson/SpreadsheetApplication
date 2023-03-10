@@ -47,8 +47,10 @@ namespace SpreadsheetEngine
         public OperatorNode(char c)
         {
             this.operatorSymbol = c;
-            this.left = new ConstantNode(0);
+            this.left = null;
             this.right = null;
+            this.precedence = 0;
+            this.association = "TBD";
         }
 
         /// <summary>
@@ -85,6 +87,15 @@ namespace SpreadsheetEngine
         {
             get { return this.precedence; }
             set { this.precedence = value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the associativity of the operation.
+        /// </summary>
+        public string Association
+        {
+            get { return this.association; }
+            set { this.association = value; }
         }
     }
 }

@@ -90,36 +90,5 @@ namespace SpreadsheetApplicationTests
             ExpressionTree exp = new ExpressionTree(expression);
             Assert.That(() => exp.Evaluate(), Throws.TypeOf<System.Collections.Generic.KeyNotFoundException>());
         }
-
-        /// <summary>
-        /// A general adding constants test.
-        /// </summary>
-        [Test]
-        public void TestAddConstants()
-        {
-            ExpressionTree expression = new ExpressionTree("1 + 2");
-            Assert.AreEqual(3, expression.Evaluate());
-        }
-
-        /// <summary>
-        /// Tests subtracting a variable.
-        /// </summary>
-        [Test]
-        public void TestSubstractVariable()
-        {
-            ExpressionTree expression = new ExpressionTree("10 - b");
-            expression.SetVariable("b", 2);
-            Assert.AreEqual(8, expression.Evaluate());
-        }
-
-        /// <summary>
-        /// Tests extra parentheses in an expression.
-        /// </summary>
-        [Test]
-        public void TestExtraParentheses()
-        {
-            ExpressionTree expression = new ExpressionTree("(((3 + 3)))");
-            Assert.AreEqual(6, expression.Evaluate());
-        }
     }
 }

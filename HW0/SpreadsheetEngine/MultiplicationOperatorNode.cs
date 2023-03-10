@@ -22,7 +22,7 @@ namespace SpreadsheetEngine
         public MultiplicationOperatorNode(char c)
             : base(c)
         {
-            this.precedence = 1;
+            this.precedence = 3;
             this.association = "left";
         }
 

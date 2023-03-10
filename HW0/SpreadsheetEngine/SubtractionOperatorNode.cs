@@ -22,7 +22,7 @@ namespace SpreadsheetEngine
         public SubtractionOperatorNode(char c)
             : base(c)
         {
-            this.precedence = 4;
+            this.precedence = 2;
             this.association = "left";
                     }
 

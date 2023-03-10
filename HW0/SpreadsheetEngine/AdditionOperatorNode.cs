@@ -22,7 +22,7 @@ namespace SpreadsheetEngine
         public AdditionOperatorNode(char c)
             : base(c)
         {
-            this.precedence = 3;
+            this.precedence = 2;
             this.association = "left";
         }
 
