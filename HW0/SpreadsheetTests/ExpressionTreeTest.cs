@@ -105,5 +105,16 @@ namespace SpreadsheetApplicationTests
             exp.Expression = "A6+2";
             Assert.That(exp.Evaluate(), Is.EqualTo(2));
         }
+
+
+        /// <summary>
+        /// Tests an expression with decimals.
+        /// </summary>
+        [Test]
+        public void TestDecimals()
+        {
+            ExpressionTree exp = new ExpressionTree("4.2-1.1");
+            Assert.That(exp.Evaluate(), Is.EqualTo(3.1));
+        }
     }
 }
