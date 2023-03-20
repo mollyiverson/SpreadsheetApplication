@@ -52,8 +52,19 @@ namespace SpreadsheetEngine
         /// </summary>
         public string Expression
         {
-            get { return this.expression; }
-            set { this.expression = value; }
+            get
+            {
+                return this.expression;
+            }
+
+            set
+            {
+                if (this.expression != value)
+                {
+                    this.expression = value;
+                    this.variableTable.Clear();
+                }
+            }
         }
 
         /// <summary>
