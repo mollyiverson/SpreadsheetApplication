@@ -89,5 +89,21 @@ namespace SpreadsheetApplicationTests
             ExpressionTree exp = new ExpressionTree(expression);
             Assert.That(() => exp.Evaluate(), Throws.TypeOf<System.Collections.Generic.KeyNotFoundException>());
         }
+
+
+        /// <summary>
+        /// Tests if variables are cleared when the expression changes.
+        /// </summary>
+        [Test]
+        public void TestNewExpressionClearVariables()
+        {
+            // I know we should have two assert statements in one test, but I believe it's necessary
+            // for this one. I have to know that A6 was set before in order to know if it changed.
+            ExpressionTree exp = new ExpressionTree("4+A6");
+            exp.SetVariable("A6", 6);
+            Assert.That(exp.Evaluate(), Is.EqualTo(10));
+            exp.Expression = "A6+2";
+            Assert.That(exp.Evaluate(), Is.EqualTo(2));
+        }
     }
 }
