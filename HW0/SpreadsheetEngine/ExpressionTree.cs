@@ -223,7 +223,9 @@ namespace SpreadsheetEngine
                         }
                         else
                         {
-                            throw new Exception("The variable " + element + " has not been defined.");
+                            this.variableTable[element] = 0;
+                            VariableNode variableNode = new VariableNode(element, 0);
+                            nodeStack.Push(variableNode);
                         }
                     }
                 }
