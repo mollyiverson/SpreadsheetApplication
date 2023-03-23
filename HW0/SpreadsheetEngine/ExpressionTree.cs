@@ -72,7 +72,8 @@ namespace SpreadsheetEngine
         /// <returns>The answer.</returns>
         public double Evaluate()
         {
-            string postfixExpression = ConvertToPostfix(this.expression);
+            string expressionNoWhitespace = string.Concat(this.expression.Where(c => !char.IsWhiteSpace(c)));
+            string postfixExpression = ConvertToPostfix(expressionNoWhitespace);
             this.root = this.ConvertPostfixToTree(postfixExpression);
 
             if (this.root == null)
