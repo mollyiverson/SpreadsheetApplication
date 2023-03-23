@@ -127,7 +127,7 @@ namespace SpreadsheetApplicationTests
         }
 
         /// <summary>
-        /// Tests if variables are cleared when the expression changes.
+        /// Normal Case: Tests if variables are cleared when the expression changes.
         /// </summary>
         [Test]
         public void TestNewExpressionClearVariables()
@@ -141,9 +141,8 @@ namespace SpreadsheetApplicationTests
             Assert.That(exp.Evaluate(), Is.EqualTo(2));
         }
 
-
         /// <summary>
-        /// Tests an expression with decimals.
+        /// Normal Case: Tests an expression with decimals.
         /// </summary>
         [Test]
         public void TestDecimals()
