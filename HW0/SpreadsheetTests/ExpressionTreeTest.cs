@@ -106,15 +106,15 @@ namespace SpreadsheetApplicationTests
         }
 
         /// <summary>
-        /// Exception Case: Tests an expression with an invalid number of parentheses (not matching).
+        /// Exception Case: Tests an expression with an invalid number of parentheses(not matching).
         /// </summary>
-        /// <param name="expression">A mathematical expression.</param>
-        //[TestCase("((2+5))-2(2+3))")]
-        //public void TestConstructInvalidExpression(string expression)
-        //{
-        //    Assert.Pass(expression);
-        //    //Assert.That(() => new ExpressionTree(expression), Throws.TypeOf<System.Exception>());
-        //}
+        /// <param name = "expression">A mathematical expression.</param>
+        [TestCase("((2+5))-2(2+3))")]
+        public void TestConstructInvalidExpression(string expression)
+        {
+            ExpressionTree exp = new ExpressionTree(expression);
+            Assert.That(() => exp.Evaluate(), Throws.TypeOf<System.Exception>());
+        }
 
         /// <summary>
         /// Exception Case: Tests if the ExpressionTree fails with an invalid operation character.
@@ -125,6 +125,31 @@ namespace SpreadsheetApplicationTests
         {
             ExpressionTree exp = new ExpressionTree(expression);
             Assert.That(() => exp.Evaluate(), Throws.TypeOf<System.Collections.Generic.KeyNotFoundException>());
+        }
+
+        /// <summary>
+        /// Normal Case: Tests if variables are cleared when the expression changes.
+        /// </summary>
+        [Test]
+        public void TestNewExpressionClearVariables()
+        {
+            // I know we should have two assert statements in one test, but I believe it's necessary
+            // for this one. I have to know that A6 was set before in order to know if it changed.
+            ExpressionTree exp = new ExpressionTree("4+A6");
+            exp.SetVariable("A6", 6);
+            Assert.That(exp.Evaluate(), Is.EqualTo(10));
+            exp.Expression = "A6+2";
+            Assert.That(exp.Evaluate(), Is.EqualTo(2));
+        }
+
+        /// <summary>
+        /// Normal Case: Tests an expression with decimals.
+        /// </summary>
+        [Test]
+        public void TestDecimals()
+        {
+            ExpressionTree exp = new ExpressionTree("4.2-1.1");
+            Assert.That(exp.Evaluate(), Is.EqualTo(3.1));
         }
     }
 }

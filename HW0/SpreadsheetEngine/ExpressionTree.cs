@@ -52,8 +52,19 @@ namespace SpreadsheetEngine
         /// </summary>
         public string Expression
         {
-            get { return this.expression; }
-            set { this.expression = value; }
+            get
+            {
+                return this.expression;
+            }
+
+            set
+            {
+                if (this.expression != value)
+                {
+                    this.expression = value;
+                    this.variableTable.Clear();
+                }
+            }
         }
 
         /// <summary>
@@ -133,19 +144,20 @@ namespace SpreadsheetEngine
                     postfixString.Append(' ');
                     OperatorNode currentOperator = OperatorNodeFactory.CreateOperatorNode(expression[index]);
 
-                    if (operatorStack.Count > 0)
+                    if (operatorStack.Count > 0 && operatorStack.Peek() != '(')
                     {
                         char nextOperator = operatorStack.Peek();
                         OperatorNode nextOperatorNode = OperatorNodeFactory.CreateOperatorNode(nextOperator);
 
                         // This is the method for left association. Will add others in next assignments.
-                        while (operatorStack.Count > 0 && nextOperatorNode.Precedence >= currentOperator.Precedence)
+                        while (operatorStack.Count > 0 && operatorStack.Peek() != '(' && nextOperatorNode.Precedence >= currentOperator.Precedence)
                         {
                             nextOperator = operatorStack.Pop();
+                            postfixString.Append(' ');
                             postfixString.Append(nextOperator);
                             postfixString.Append(' ');
 
-                            if (operatorStack.Count != 0)
+                            if (operatorStack.Count != 0 && operatorStack.Peek() != '(')
                             {
                                 nextOperator = operatorStack.Peek();
                                 nextOperatorNode = OperatorNodeFactory.CreateOperatorNode(nextOperator);
@@ -155,10 +167,29 @@ namespace SpreadsheetEngine
 
                     operatorStack.Push(expression[index]);
                 }
+                else if (expression[index] == ')')
+                {
+                    while (operatorStack.Count > 0 && operatorStack.Peek() != '(')
+                    {
+                        postfixString.Append(' ');
+                        postfixString.Append(operatorStack.Pop());
+                    }
 
-                // Character is alphanumeric.
+                    if (operatorStack.Count == 0)
+                    {
+                        throw new System.Exception("Invalid expression.");
+                    }
+
+                    postfixString.Append(' ');
+                    operatorStack.Pop();    // pop the left parenthesis and discard it
+                }
+                else if (expression[index] == '(')
+                {
+                    operatorStack.Push(expression[index]);
+                }
                 else
                 {
+                    // Character is alphanumeric or a decimal point.
                     if (!(IsAlphaNumeric(expression[index]) || expression[index] == '.'))
                     {
                         throw new System.Collections.Generic.KeyNotFoundException();
@@ -172,6 +203,11 @@ namespace SpreadsheetEngine
 
             while (operatorStack.Count > 0)
             {
+                if (operatorStack.Peek() == '(')
+                {
+                    throw new System.Exception("Invalid expression.");
+                }
+
                 postfixString.Append(" " + operatorStack.Pop());
             }
 
@@ -185,7 +221,7 @@ namespace SpreadsheetEngine
         /// <returns>ExpressionTree.</returns>
         private Node? ConvertPostfixToTree(string postfixString)
         {
-            string[] elements = postfixString.Split(' ');
+            string[] elements = System.Text.RegularExpressions.Regex.Split(postfixString, @"\s+");
             if (string.IsNullOrEmpty(postfixString))
             {
                 return null;
@@ -195,6 +231,11 @@ namespace SpreadsheetEngine
 
             foreach (var element in elements)
             {
+                if (element == string.Empty)
+                {
+                    break;
+                }
+
                 if (IsOperator(element[0]))
                 {
                     // We need an Operator Node
@@ -224,7 +265,9 @@ namespace SpreadsheetEngine
                         }
                         else
                         {
-                            throw new Exception("The variable " + element + " has not been defined.");
+                            this.variableTable[element] = 0;
+                            VariableNode variableNode = new VariableNode(element, 0);
+                            nodeStack.Push(variableNode);
                         }
                     }
                 }
