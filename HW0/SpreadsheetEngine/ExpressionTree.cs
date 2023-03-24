@@ -175,9 +175,13 @@ namespace SpreadsheetEngine
                         postfixString.Append(operatorStack.Pop());
                     }
 
+                    if (operatorStack.Count == 0)
+                    {
+                        throw new System.Exception("Invalid expression.");
+                    }
+
                     postfixString.Append(' ');
                     operatorStack.Pop();    // pop the left parenthesis and discard it
-
                 }
                 else if (expression[index] == '(')
                 {
@@ -199,6 +203,11 @@ namespace SpreadsheetEngine
 
             while (operatorStack.Count > 0)
             {
+                if (operatorStack.Peek() == '(')
+                {
+                    throw new System.Exception("Invalid expression.");
+                }
+
                 postfixString.Append(" " + operatorStack.Pop());
             }
 

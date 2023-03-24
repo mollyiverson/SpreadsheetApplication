@@ -112,7 +112,8 @@ namespace SpreadsheetApplicationTests
         [TestCase("((2+5))-2(2+3))")]
         public void TestConstructInvalidExpression(string expression)
         {
-            Assert.That(() => new ExpressionTree(expression), Throws.TypeOf<System.Exception>());
+            ExpressionTree exp = new ExpressionTree(expression);
+            Assert.That(() => exp.Evaluate(), Throws.TypeOf<System.Exception>());
         }
 
         /// <summary>
