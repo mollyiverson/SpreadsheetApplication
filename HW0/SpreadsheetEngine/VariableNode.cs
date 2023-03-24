@@ -53,7 +53,6 @@ namespace SpreadsheetEngine
         {
             get { return this.value; }
             set { this.value = value; }
-
         }
 
         /// <summary>
