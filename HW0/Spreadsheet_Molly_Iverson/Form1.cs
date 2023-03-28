@@ -44,9 +44,7 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">Cell property changed event.</param>
         private void Spreadsheet_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            Cell? currentCell = sender as Cell;
-
-            if (currentCell != null)
+            if (sender is Cell currentCell)
             {
                 int row = currentCell.RowIndex;
                 int column = currentCell.ColumnIndex;
@@ -86,7 +84,7 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">Button is clicked event.</param>
         private void DemoButton_Click(object sender, EventArgs e)
         {
-            Random random = new Random();
+            Random random = new ();
             for (int i = 0; i < 50; i++)
             {
                 Cell? currentCell = this.spreadsheet.GetCell(random.Next(0, 50), random.Next(0, 26));
@@ -116,12 +114,25 @@ namespace Spreadsheet_Molly_Iverson
         }
 
         /// <summary>
-        /// This event is called when a cell in the datagrid is clicked.
+        /// The event if any cell in the spreadsheet has started being edited by the user.
         /// </summary>
-        /// <param name="sender">Datagrid.</param>
-        /// <param name="e">Cell is clicked.</param>
-        private void DataGridView1_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        /// <param name="sender">The selecteld DataGridViewCell.</param>
+        /// <param name="e">Event that reflects that the current DataGridViewCell is being edited.</param>
+        private void DataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
+            string msg = string.Format("Editing Cell at ({0}, {1})", e.ColumnIndex, e.RowIndex);
+            this.Text = msg;
+        }
+
+        /// <summary>
+        /// The event if any cell in the spreadsheet is finished being edited by the user.
+        /// </summary>
+        /// <param name="sender">The selecteld DataGridViewCell.</param>
+        /// <param name="e">Occurs when edit mode stops for the currently selected cell.</param>
+        private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            string msg = string.Format("Finished Editing Cell at ({0}, {1})", e.ColumnIndex, e.RowIndex);
+            this.Text = msg;
         }
     }
 }
