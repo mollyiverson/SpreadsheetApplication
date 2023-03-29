@@ -154,7 +154,6 @@ namespace Spreadsheet_Molly_Iverson
             }
         }
 
-
         /// <summary>
         /// Shows the text cell value to show when hovering over the cell.
         /// </summary>

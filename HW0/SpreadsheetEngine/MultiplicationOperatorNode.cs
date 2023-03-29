@@ -18,10 +18,11 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Initializes a new instance of the <see cref="MultiplicationOperatorNode"/> class.
         /// </summary>
-        /// <param name="c">The operator symbol.</param>
-        public MultiplicationOperatorNode(char c)
-            : base(c)
+        public MultiplicationOperatorNode()
         {
+            this.left = null;
+            this.right = null;
+            this.operatorSymbol = '*';
             this.precedence = 3;
             this.association = "left";
         }

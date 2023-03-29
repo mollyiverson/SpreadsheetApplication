@@ -36,6 +36,9 @@ namespace SpreadsheetEngine
         /// </summary>
         private Node? root;
 
+
+        private OperatorNodeFactory operatorNodeFactory;
+
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
@@ -45,6 +48,7 @@ namespace SpreadsheetEngine
             this.expression = expression;
             this.variableTable = new Dictionary<string, double>();
             this.root = null;
+            this.operatorNodeFactory= new OperatorNodeFactory();
         }
 
         /// <summary>
@@ -96,16 +100,6 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
-        /// Determines if a character is a valid operator.
-        /// </summary>
-        /// <param name="op">Operator.</param>
-        /// <returns>Whether the operator is valid.</returns>
-        private static bool IsOperator(char op)
-        {
-            return OperatorNodeFactory.Operators.Contains(op);
-        }
-
-        /// <summary>
         /// Determines if a character is alphanumeric.
         /// </summary>
         /// <param name="character">A char.</param>
@@ -129,7 +123,7 @@ namespace SpreadsheetEngine
         /// </summary>
         /// <param name="expression">A mathematical expression.</param>
         /// <returns>The expression in postfix format.</returns>
-        private static string ConvertToPostfix(string expression)
+        private string ConvertToPostfix(string expression)
         {
             Stack<char> operatorStack = new Stack<char>();
             StringBuilder postfixString = new StringBuilder();
@@ -139,15 +133,15 @@ namespace SpreadsheetEngine
             while (index < expression.Length)
             {
                 // If character is an operator
-                if (IsOperator(expression[index]))
+                if (this.operatorNodeFactory.IsOperator(expression[index]))
                 {
                     postfixString.Append(' ');
-                    OperatorNode currentOperator = OperatorNodeFactory.CreateOperatorNode(expression[index]);
+                    OperatorNode currentOperator = this.operatorNodeFactory.CreateOperatorNode(expression[index]);
 
                     if (operatorStack.Count > 0 && operatorStack.Peek() != '(')
                     {
                         char nextOperator = operatorStack.Peek();
-                        OperatorNode nextOperatorNode = OperatorNodeFactory.CreateOperatorNode(nextOperator);
+                        OperatorNode nextOperatorNode = this.operatorNodeFactory.CreateOperatorNode(nextOperator);
 
                         // This is the method for left association. Will add others in next assignments.
                         while (operatorStack.Count > 0 && operatorStack.Peek() != '(' && nextOperatorNode.Precedence >= currentOperator.Precedence)
@@ -160,7 +154,7 @@ namespace SpreadsheetEngine
                             if (operatorStack.Count != 0 && operatorStack.Peek() != '(')
                             {
                                 nextOperator = operatorStack.Peek();
-                                nextOperatorNode = OperatorNodeFactory.CreateOperatorNode(nextOperator);
+                                nextOperatorNode = this.operatorNodeFactory.CreateOperatorNode(nextOperator);
                             }
                         }
                     }
@@ -236,12 +230,12 @@ namespace SpreadsheetEngine
                     break;
                 }
 
-                if (IsOperator(element[0]))
+                if (this.operatorNodeFactory.IsOperator(element[0]))
                 {
                     // We need an Operator Node
                     Node rightOperand = nodeStack.Pop();
                     Node leftOperand = nodeStack.Pop();
-                    OperatorNode operatorNode = OperatorNodeFactory.CreateOperatorNode(element[0]);
+                    OperatorNode operatorNode = this.operatorNodeFactory.CreateOperatorNode(element[0]);
                     operatorNode.Left = leftOperand;
                     operatorNode.Right = rightOperand;
                     nodeStack.Push(operatorNode);
