@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -108,7 +109,7 @@ namespace Spreadsheet_Molly_Iverson
                 Cell? currentCell = this.spreadsheet.GetCell(i, 0);
                 if (currentCell != null)
                 {
-                    currentCell.Text = "=B" + i;
+                    currentCell.Text = "=B" + (i + 1);
                 }
             }
         }
@@ -116,23 +117,76 @@ namespace Spreadsheet_Molly_Iverson
         /// <summary>
         /// The event if any cell in the spreadsheet has started being edited by the user.
         /// </summary>
-        /// <param name="sender">The selecteld DataGridViewCell.</param>
+        /// <param name="sender">The selected DataGridViewCell.</param>
         /// <param name="e">Event that reflects that the current DataGridViewCell is being edited.</param>
         private void DataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
-            string msg = string.Format("Editing Cell at ({0}, {1})", e.ColumnIndex, e.RowIndex);
-            this.Text = msg;
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
+                if (currentCell != null)
+                {
+                    this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Text;
+                }
+
+                string msg = string.Format("Editing Cell at {0}{1}", Convert.ToChar(e.ColumnIndex + 65), e.RowIndex + 1);
+                this.Text = msg;
+            }
         }
 
         /// <summary>
         /// The event if any cell in the spreadsheet is finished being edited by the user.
         /// </summary>
-        /// <param name="sender">The selecteld DataGridViewCell.</param>
+        /// <param name="sender">The selected DataGridViewCell.</param>
         /// <param name="e">Occurs when edit mode stops for the currently selected cell.</param>
         private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
         {
-            string msg = string.Format("Finished Editing Cell at ({0}, {1})", e.ColumnIndex, e.RowIndex);
-            this.Text = msg;
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
+                if (currentCell != null)
+                {
+                    currentCell.Text = (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                }
+
+                string msg = string.Format("Finished Editing Cell at {0}{1}", Convert.ToChar(e.ColumnIndex + 65), e.RowIndex + 1);
+                this.Text = msg;
+            }
         }
+
+
+        /// <summary>
+        /// Shows the text cell value to show when hovering over the cell.
+        /// </summary>
+        /// <param name="sender">The hovered over DataGridViewCell.</param>
+        /// <param name="e">Occurs when the mouse is hovering over the cell.</param>
+        //private void DataGridView1_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+        //    {
+        //        Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
+        //        if (currentCell != null)
+        //        {
+        //            this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
+        //        }
+        //    }
+        //}
+
+        /// <summary>
+        /// The Cell text goes back to its value once the mouse stops hovering over it.
+        /// </summary>
+        /// <param name="sender">The hovered over DataGridViewCell.</param>
+        /// <param name="e">Occurs when the mouse tops hovering over the cell.</param>
+        //private void DataGridView1_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
+        //{
+        //    if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+        //    {
+        //        Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
+        //        if (currentCell != null)
+        //        {
+        //            this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
+        //        }
+        //    }
+        //}
     }
 }

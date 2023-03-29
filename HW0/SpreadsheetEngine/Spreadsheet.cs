@@ -117,7 +117,7 @@ namespace SpreadsheetEngine
 
                         // Convert
                         int columnIndex = columnLetter - 65;
-                        int rowIndex = int.Parse(rows);
+                        int rowIndex = int.Parse(rows) - 1;
 
                         currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
                     }
