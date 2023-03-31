@@ -176,33 +176,51 @@ namespace SpreadsheetEngine
             {
                 if (e.PropertyName == "Text")
                 {
-                    if (currentCell.Text == null || currentCell.Text == string.Empty)
+                    string cellText = currentCell.Text;
+                    currentCell.ClearList();
+                    if (cellText == null || cellText == string.Empty)
                     {
-                        currentCell.ClearList();
                         currentCell.Value = string.Empty;
-
                     }
-                    else if (currentCell.Text[0] != '=')
+                    else if (cellText[0] != '=')
                     {
-                        currentCell.Value = currentCell.Text;
+                        currentCell.Value = cellText;
                     }
                     else
                     {
-                        string expression = currentCell.Text.Substring(1);
-                        this.expressionTree.Expression = expression;
-                        try
+                        if (this.IsOnlyCellReference(cellText))
                         {
-                            double value = this.expressionTree.Evaluate();
-                            currentCell.ClearList();
-                            currentCell.DependentCells = this.GetDependentCells();
+                            // Get the letter column
+                            char columnLetter = cellText[1];
+
+                            // Get number of rows as a substring
+                            string rows = cellText.Substring(2);
+
+                            // Convert
+                            int columnIndex = columnLetter - 65;
+                            int rowIndex = int.Parse(rows) - 1;
+
+                            currentCell.DependentCells.Add(this.cellArray[rowIndex, columnIndex]);
                             currentCell.Subscribe();
-                            currentCell.Value = value + string.Empty;
+                            currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
                         }
-                        catch
+                        else
                         {
-                            // a nonempty cell is referenced
-                            currentCell.ClearList();
-                            currentCell.Value = string.Empty;
+                            string expression = cellText.Substring(1);
+                            this.expressionTree.Expression = expression;
+                            try
+                            {
+                                double value = this.expressionTree.Evaluate();
+                                currentCell.DependentCells = this.GetDependentCells();
+                                currentCell.Subscribe();
+                                currentCell.Value = value + string.Empty;
+                            }
+                            catch
+                            {
+                                // a nonempty cell is referenced
+                                currentCell.ClearList();
+                                currentCell.Value = string.Empty;
+                            }
                         }
                     }
                 }
@@ -225,18 +243,60 @@ namespace SpreadsheetEngine
 
             if (currentCell != null)
             {
-                if (currentCell.Text[0] != '=')
+                string cellText = currentCell.Text;
+                if (cellText[0] != '=')
                 {
-                    currentCell.Value = currentCell.Text;
+                    currentCell.Value = cellText;
                 }
                 else
                 {
-                    string expression = currentCell.Text.Substring(1);
-                    this.expressionTree.Expression = expression;
-                    double value = this.expressionTree.Evaluate();
-                    currentCell.Value = value + string.Empty;
+                    if (this.IsOnlyCellReference(cellText))
+                    {
+                        // Get the letter column
+                        char columnLetter = cellText[1];
+
+                        // Get number of rows as a substring
+                        string rows = cellText.Substring(2);
+
+                        // Convert
+                        int columnIndex = columnLetter - 65;
+                        int rowIndex = int.Parse(rows) - 1;
+
+                        currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
+                    }
+                    else
+                    {
+                        string expression = cellText.Substring(1);
+                        this.expressionTree.Expression = expression;
+                        double value = this.expressionTree.Evaluate();
+                        currentCell.Value = value + string.Empty;
+                    }
                 }
             }
+        }
+
+        /// <summary>
+        /// Returns whether an expression is just only a reference to another cell (i.e. "=B2").
+        /// </summary>
+        /// <param name="expression">An expression begining with "=".</param>
+        /// <returns>Whether the expression is only a reference to one cell.</returns>
+        private bool IsOnlyCellReference(string expression)
+        {
+            if (expression.Length >= 3 && expression.Length <= 4 && (expression[0] == '=' && char.IsLetter(expression[1])))
+            {
+                // Get number of rows as a substring
+                string rows = expression.Substring(2);
+
+                // Convert
+                int rowIndex = int.Parse(rows) - 1;
+
+                if (rowIndex >= 0 && rowIndex < this.RowCount)
+                {
+                    return true;
+                }
+            }
+
+            return false;
         }
 
         /// <summary>
@@ -365,8 +425,7 @@ namespace SpreadsheetEngine
                     {
                         if (currentCell.Value == string.Empty || currentCell.Value == null)
                         {
-                            this.ClearList();
-                            this.Text = string.Empty;
+                            this.Value = string.Empty;
                         }
                         else
                         {
