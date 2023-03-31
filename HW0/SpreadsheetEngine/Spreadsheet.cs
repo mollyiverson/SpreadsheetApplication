@@ -32,6 +32,11 @@ namespace SpreadsheetEngine
         private int columnCount;
 
         /// <summary>
+        /// Used to evaluate the formulas in the cells.
+        /// </summary>
+        private ExpressionTree expressionTree;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
         /// Creates the spreadsheet with specfied dimensions.
         /// </summary>
@@ -39,6 +44,7 @@ namespace SpreadsheetEngine
         /// <param name="columns">The number of columns in the spreadsheet.</param>
         public Spreadsheet(int rows, int columns)
         {
+            this.expressionTree = new ExpressionTree(string.Empty, this.GetCellValue);
             this.rowCount = rows;
             this.columnCount = columns;
             this.cellArray = new SCell[rows, columns];
@@ -71,6 +77,46 @@ namespace SpreadsheetEngine
         public int ColumnCount
         {
             get { return this.columnCount; }
+        }
+
+        /// <summary>
+        /// This function will be referenced in the ExpressionTree class when it needs to
+        /// access a variable.
+        /// </summary>
+        /// <param name="cellName">The Cell name (i.e. B3).</param>
+        /// <returns>The evaluated value of the expression/cell.</returns>
+        /// <exception cref="Exception">Throws an exception if GetCell is called with out of range data.</exception>
+        public double GetCellValue(string cellName)
+        {
+            // Get the letter column
+            char columnLetter = cellName[0];
+
+            // Get number of rows as a substring
+            string rows = cellName.Substring(1);
+
+            // Convert
+            int columnIndex = columnLetter - 65;
+            int rowIndex = int.Parse(rows) - 1;
+
+            Cell? currentCell = this.GetCell(rowIndex, columnIndex);
+            if (currentCell == null)
+            {
+                throw new Exception("GetCell: requesting a cell out of range.");
+            }
+            else
+            {
+                string cellValue = currentCell.Value;
+                try
+                {
+                    double answer = Convert.ToDouble(cellValue);
+                    return answer;
+                }
+                catch (System.FormatException ex)
+                {
+                    Console.WriteLine(ex.Message);
+                    throw new Exception("Cannot reference an empty cell.");
+                }
+            }
         }
 
         /// <summary>
@@ -109,17 +155,10 @@ namespace SpreadsheetEngine
                     }
                     else
                     {
-                        // Get the letter column
-                        char columnLetter = currentCell.Text[1];
-
-                        // Get number of rows as a substring
-                        string rows = currentCell.Text.Substring(2);
-
-                        // Convert
-                        int columnIndex = columnLetter - 65;
-                        int rowIndex = int.Parse(rows) - 1;
-
-                        currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
+                        string expression = currentCell.Text.Substring(1);
+                        this.expressionTree.Expression = expression;
+                        double value = this.expressionTree.Evaluate();
+                        currentCell.Value = value + string.Empty;
                     }
                 }
 

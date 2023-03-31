@@ -36,19 +36,28 @@ namespace SpreadsheetEngine
         /// </summary>
         private Node? root;
 
-
+        /// <summary>
+        /// Creates instances of the OperatorNode subclasses.
+        /// </summary>
         private OperatorNodeFactory operatorNodeFactory;
+
+        /// <summary>
+        /// Allows the outside project to implement their own way of accessing their private data.
+        /// </summary>
+        private Func<string, double> getCellValue;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         /// <param name="expression">The math expression with variables, operators, and constants.</param>
-        public ExpressionTree(string expression)
+        /// <param name="getCellValue">Function so outside project can send in their own private data.</param>
+        public ExpressionTree(string expression, Func<string, double> getCellValue)
         {
             this.expression = expression;
             this.variableTable = new Dictionary<string, double>();
             this.root = null;
-            this.operatorNodeFactory= new OperatorNodeFactory();
+            this.operatorNodeFactory = new OperatorNodeFactory();
+            this.getCellValue = getCellValue;
         }
 
         /// <summary>
@@ -72,6 +81,17 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Allows outside projects to implement their own function that accesses their own data.
+        /// </summary>
+        /// <param name="variable">The name of the variable being accessed.</param>
+        /// <param name="function">The outside function that gets the data for the variable.</param>
+        /// <returns>The variable's data.</returns>
+        public double LookUpVariable(string variable, Func<string, double> function)
+        {
+            return function(variable);
+        }
+
+        /// <summary>
         /// Sets the specified variable within the ExpressionTree variables dictionary.
         /// </summary>
         /// <param name="variableName">The name of the variable.</param>
@@ -88,7 +108,7 @@ namespace SpreadsheetEngine
         public double Evaluate()
         {
             string expressionNoWhitespace = string.Concat(this.expression.Where(c => !char.IsWhiteSpace(c)));
-            string postfixExpression = ConvertToPostfix(expressionNoWhitespace);
+            string postfixExpression = this.ConvertToPostfix(expressionNoWhitespace);
             this.root = this.ConvertPostfixToTree(postfixExpression);
 
             if (this.root == null)
@@ -251,18 +271,20 @@ namespace SpreadsheetEngine
                     }
                     else
                     {
+                        VariableNode variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
+                        nodeStack.Push(variableNode);
                         // We need a VariableNode
-                        if (this.variableTable.TryGetValue(element, out double value))
-                        {
-                            VariableNode variableNode = new VariableNode(element, value);
-                            nodeStack.Push(variableNode);
-                        }
-                        else
-                        {
-                            this.variableTable[element] = 0;
-                            VariableNode variableNode = new VariableNode(element, 0);
-                            nodeStack.Push(variableNode);
-                        }
+                        //if (this.variableTable.TryGetValue(element, out double value))
+                        //{
+                        //    VariableNode variableNode = new VariableNode(element, value);
+                        //    nodeStack.Push(variableNode);
+                        //}
+                        //else
+                        //{
+                        //    this.variableTable[element] = 0;
+                        //    VariableNode variableNode = new VariableNode(element, 0);
+                        //    nodeStack.Push(variableNode);
+                        //}
                     }
                 }
             }
