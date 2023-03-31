@@ -176,7 +176,13 @@ namespace SpreadsheetEngine
             {
                 if (e.PropertyName == "Text")
                 {
-                    if (currentCell.Text[0] != '=')
+                    if (currentCell.Text == null || currentCell.Text == string.Empty)
+                    {
+                        currentCell.ClearList();
+                        currentCell.Value = string.Empty;
+
+                    }
+                    else if (currentCell.Text[0] != '=')
                     {
                         currentCell.Value = currentCell.Text;
                     }
@@ -184,11 +190,20 @@ namespace SpreadsheetEngine
                     {
                         string expression = currentCell.Text.Substring(1);
                         this.expressionTree.Expression = expression;
-                        double value = this.expressionTree.Evaluate();
-                        currentCell.ClearList();
-                        currentCell.DependentCells = this.GetDependentCells();
-                        currentCell.Subscribe();
-                        currentCell.Value = value + string.Empty;
+                        try
+                        {
+                            double value = this.expressionTree.Evaluate();
+                            currentCell.ClearList();
+                            currentCell.DependentCells = this.GetDependentCells();
+                            currentCell.Subscribe();
+                            currentCell.Value = value + string.Empty;
+                        }
+                        catch
+                        {
+                            // a nonempty cell is referenced
+                            currentCell.ClearList();
+                            currentCell.Value = string.Empty;
+                        }
                     }
                 }
                 else if (e.PropertyName == "Value")
@@ -346,7 +361,18 @@ namespace SpreadsheetEngine
             {
                 if (e.PropertyName == "Value")
                 {
-                    this.DependentCellPropertyChanged.Invoke(this, new EventArgs());
+                    if (sender is Cell currentCell)
+                    {
+                        if (currentCell.Value == string.Empty || currentCell.Value == null)
+                        {
+                            this.ClearList();
+                            this.Text = string.Empty;
+                        }
+                        else
+                        {
+                            this.DependentCellPropertyChanged.Invoke(this, new EventArgs());
+                        }
+                    }
                 }
             }
         }
