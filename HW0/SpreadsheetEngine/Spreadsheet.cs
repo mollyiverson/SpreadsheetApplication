@@ -217,7 +217,7 @@ namespace SpreadsheetEngine
                             }
                             catch
                             {
-                                // a nonempty cell is referenced
+                                // a nonempty/nonvalid cell is referenced
                                 currentCell.ClearList();
                                 currentCell.Value = string.Empty;
                             }
