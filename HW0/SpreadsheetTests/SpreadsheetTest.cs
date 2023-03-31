@@ -176,5 +176,28 @@ namespace SpreadsheetApplicationTests
                 Assert.Fail();
             }
         }
+
+        /// <summary>
+        /// Exception Case: Tests referencing a cell with a string(words) and attempts to perform an arithmetic operation on it.
+        /// This normally would cause an exception, but it has been handled.
+        /// </summary>
+        [Test]
+        public void TestAddStringCell()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            Cell? cell2 = spreadsheet.GetCell(2, 2);
+            if (cell != null && cell2 != null)
+            {
+                cell.Text = "Hello";
+                cell2.Text = "=B2 + 1";
+                Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                Assert.That(cell2.Text, Is.EqualTo("=B2 + 1")); // Text should not change
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
     }
 }
