@@ -43,10 +43,9 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Initializes a new instance of the <see cref="OperatorNode"/> class.
         /// </summary>
-        /// <param name="c">Operation character.</param>
-        public OperatorNode(char c)
+        public OperatorNode()
         {
-            this.operatorSymbol = c;
+            this.operatorSymbol = '\0';
             this.left = null;
             this.right = null;
             this.precedence = 0;

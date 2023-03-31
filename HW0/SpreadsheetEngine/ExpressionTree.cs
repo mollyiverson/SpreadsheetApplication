@@ -37,6 +37,37 @@ namespace SpreadsheetEngine
         private Node? root;
 
         /// <summary>
+        /// Creates instances of the OperatorNode subclasses.
+        /// </summary>
+        private OperatorNodeFactory operatorNodeFactory;
+
+        /// <summary>
+        /// Allows the outside project to implement their own way of accessing their private data.
+        /// </summary>
+        private Func<string, double>? getCellValue;
+
+        /// <summary>
+        /// Determines if the Variable values should come from the ExpressionTree variableTable
+        /// or from the outside project via the getCellValue function.
+        /// </summary>
+        private bool useDictionary;
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        /// <param name="expression">The math expression with variables, operators, and constants.</param>
+        /// <param name="getCellValue">Function so outside project can send in their own private data.</param>
+        public ExpressionTree(string expression, Func<string, double> getCellValue)
+        {
+            this.expression = expression;
+            this.variableTable = new Dictionary<string, double>();
+            this.root = null;
+            this.operatorNodeFactory = new OperatorNodeFactory();
+            this.getCellValue = getCellValue;
+            this.useDictionary = false;
+        }
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
         /// </summary>
         /// <param name="expression">The math expression with variables, operators, and constants.</param>
@@ -45,6 +76,9 @@ namespace SpreadsheetEngine
             this.expression = expression;
             this.variableTable = new Dictionary<string, double>();
             this.root = null;
+            this.operatorNodeFactory = new OperatorNodeFactory();
+            this.useDictionary = true;
+            this.getCellValue = null;
         }
 
         /// <summary>
@@ -84,7 +118,7 @@ namespace SpreadsheetEngine
         public double Evaluate()
         {
             string expressionNoWhitespace = string.Concat(this.expression.Where(c => !char.IsWhiteSpace(c)));
-            string postfixExpression = ConvertToPostfix(expressionNoWhitespace);
+            string postfixExpression = this.ConvertToPostfix(expressionNoWhitespace);
             this.root = this.ConvertPostfixToTree(postfixExpression);
 
             if (this.root == null)
@@ -96,13 +130,12 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
-        /// Determines if a character is a valid operator.
+        /// Returns a list of all variables involved in the current expression.
         /// </summary>
-        /// <param name="op">Operator.</param>
-        /// <returns>Whether the operator is valid.</returns>
-        private static bool IsOperator(char op)
+        /// <returns>A list of string variable names.</returns>
+        public List<string> GetVariables()
         {
-            return OperatorNodeFactory.Operators.Contains(op);
+            return this.variableTable.Keys.ToList();
         }
 
         /// <summary>
@@ -125,11 +158,22 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Allows outside projects to implement their own function that accesses their own data.
+        /// </summary>
+        /// <param name="variable">The name of the variable being accessed.</param>
+        /// <param name="function">The outside function that gets the data for the variable.</param>
+        /// <returns>The variable's data.</returns>
+        private double LookUpVariable(string variable, Func<string, double> function)
+        {
+            return function(variable);
+        }
+
+        /// <summary>
         /// Converts the regular mathematical expression to postfix format.
         /// </summary>
         /// <param name="expression">A mathematical expression.</param>
         /// <returns>The expression in postfix format.</returns>
-        private static string ConvertToPostfix(string expression)
+        private string ConvertToPostfix(string expression)
         {
             Stack<char> operatorStack = new Stack<char>();
             StringBuilder postfixString = new StringBuilder();
@@ -139,15 +183,15 @@ namespace SpreadsheetEngine
             while (index < expression.Length)
             {
                 // If character is an operator
-                if (IsOperator(expression[index]))
+                if (this.operatorNodeFactory.IsOperator(expression[index]))
                 {
                     postfixString.Append(' ');
-                    OperatorNode currentOperator = OperatorNodeFactory.CreateOperatorNode(expression[index]);
+                    OperatorNode currentOperator = this.operatorNodeFactory.CreateOperatorNode(expression[index]);
 
                     if (operatorStack.Count > 0 && operatorStack.Peek() != '(')
                     {
                         char nextOperator = operatorStack.Peek();
-                        OperatorNode nextOperatorNode = OperatorNodeFactory.CreateOperatorNode(nextOperator);
+                        OperatorNode nextOperatorNode = this.operatorNodeFactory.CreateOperatorNode(nextOperator);
 
                         // This is the method for left association. Will add others in next assignments.
                         while (operatorStack.Count > 0 && operatorStack.Peek() != '(' && nextOperatorNode.Precedence >= currentOperator.Precedence)
@@ -160,7 +204,7 @@ namespace SpreadsheetEngine
                             if (operatorStack.Count != 0 && operatorStack.Peek() != '(')
                             {
                                 nextOperator = operatorStack.Peek();
-                                nextOperatorNode = OperatorNodeFactory.CreateOperatorNode(nextOperator);
+                                nextOperatorNode = this.operatorNodeFactory.CreateOperatorNode(nextOperator);
                             }
                         }
                     }
@@ -236,12 +280,12 @@ namespace SpreadsheetEngine
                     break;
                 }
 
-                if (IsOperator(element[0]))
+                if (this.operatorNodeFactory.IsOperator(element[0]))
                 {
                     // We need an Operator Node
                     Node rightOperand = nodeStack.Pop();
                     Node leftOperand = nodeStack.Pop();
-                    OperatorNode operatorNode = OperatorNodeFactory.CreateOperatorNode(element[0]);
+                    OperatorNode operatorNode = this.operatorNodeFactory.CreateOperatorNode(element[0]);
                     operatorNode.Left = leftOperand;
                     operatorNode.Right = rightOperand;
                     nodeStack.Push(operatorNode);
@@ -258,16 +302,32 @@ namespace SpreadsheetEngine
                     else
                     {
                         // We need a VariableNode
-                        if (this.variableTable.TryGetValue(element, out double value))
+                        if (this.useDictionary)
                         {
-                            VariableNode variableNode = new VariableNode(element, value);
-                            nodeStack.Push(variableNode);
+                            if (this.variableTable.TryGetValue(element, out double value))
+                            {
+                                VariableNode variableNode = new VariableNode(element, value);
+                                nodeStack.Push(variableNode);
+                            }
+                            else
+                            {
+                                this.variableTable[element] = 0;
+                                VariableNode variableNode = new VariableNode(element, 0);
+                                nodeStack.Push(variableNode);
+                            }
                         }
                         else
                         {
-                            this.variableTable[element] = 0;
-                            VariableNode variableNode = new VariableNode(element, 0);
-                            nodeStack.Push(variableNode);
+                            if (this.getCellValue != null)
+                            {
+                                VariableNode variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
+                                nodeStack.Push(variableNode);
+                                this.variableTable[element] = 0;
+                            }
+                            else
+                            {
+                                throw new Exception("Conflict between whether to use ExpressionTree dictionary or get variables from outside source.");
+                            }
                         }
                     }
                 }

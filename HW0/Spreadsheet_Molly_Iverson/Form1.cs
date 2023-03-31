@@ -6,6 +6,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
+using System.Data.Common;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -44,14 +45,17 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">Cell property changed event.</param>
         private void Spreadsheet_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            Cell? currentCell = sender as Cell;
-
-            if (currentCell != null)
+            if (sender is Cell currentCell)
             {
                 int row = currentCell.RowIndex;
                 int column = currentCell.ColumnIndex;
 
                 if (e.PropertyName == "Text")
+                {
+                    this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
+                }
+
+                if (e.PropertyName == "Value")
                 {
                     this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
                 }
@@ -86,7 +90,7 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">Button is clicked event.</param>
         private void DemoButton_Click(object sender, EventArgs e)
         {
-            Random random = new Random();
+            Random random = new ();
             for (int i = 0; i < 50; i++)
             {
                 Cell? currentCell = this.spreadsheet.GetCell(random.Next(0, 50), random.Next(0, 26));
@@ -110,18 +114,50 @@ namespace Spreadsheet_Molly_Iverson
                 Cell? currentCell = this.spreadsheet.GetCell(i, 0);
                 if (currentCell != null)
                 {
-                    currentCell.Text = "=B" + i;
+                    currentCell.Text = "=B" + (i + 1);
                 }
             }
         }
 
         /// <summary>
-        /// This event is called when a cell in the datagrid is clicked.
+        /// The event if any cell in the spreadsheet has started being edited by the user.
         /// </summary>
-        /// <param name="sender">Datagrid.</param>
-        /// <param name="e">Cell is clicked.</param>
-        private void DataGridView1_CellContentClick(object? sender, DataGridViewCellEventArgs e)
+        /// <param name="sender">The selected DataGridViewCell.</param>
+        /// <param name="e">Event that reflects that the current DataGridViewCell is being edited.</param>
+        private void DataGridView1_CellBeginEdit(object sender, DataGridViewCellCancelEventArgs e)
         {
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
+                if (currentCell != null)
+                {
+                    this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Text;
+                }
+
+                string msg = string.Format("Editing Cell at {0}{1}", Convert.ToChar(e.ColumnIndex + 65), e.RowIndex + 1);
+                this.Text = msg;
+            }
+        }
+
+        /// <summary>
+        /// The event if any cell in the spreadsheet is finished being edited by the user.
+        /// </summary>
+        /// <param name="sender">The selected DataGridViewCell.</param>
+        /// <param name="e">Occurs when edit mode stops for the currently selected cell.</param>
+        private void DataGridView1_CellEndEdit(object sender, DataGridViewCellEventArgs e)
+        {
+            if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
+            {
+                Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
+                if (currentCell != null)
+                {
+                    currentCell.Text = (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+                    this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
+                }
+
+                string msg = string.Format("Finished Editing Cell at {0}{1}", Convert.ToChar(e.ColumnIndex + 65), e.RowIndex + 1);
+                this.Text = msg;
+            }
         }
     }
 }
