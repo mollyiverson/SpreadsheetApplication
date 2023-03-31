@@ -25,3 +25,7 @@ using System.Diagnostics.CodeAnalysis;
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "The precedence value is protected so the concrete subclasses can access it.", Scope = "member", Target = "~F:SpreadsheetEngine.OperatorNode.precedence")]
 
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "The association value is protected so the concrete subclasses can access it.", Scope = "member", Target = "~F:SpreadsheetEngine.OperatorNode.association")]
+
+[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1130:Use lambda syntax", Justification = "We were taught to use delegate instead of lambda syntax.", Scope = "member", Target = "~E:SpreadsheetEngine.Cell.CellValueChanged")]
+
+[assembly: SuppressMessage("StyleCop.CSharp.ReadabilityRules", "SA1130:Use lambda syntax", Justification = "We were taught to use delegate instead of lambda syntax.", Scope = "member", Target = "~E:SpreadsheetEngine.Spreadsheet.SCell.DependentCellPropertyChanged")]

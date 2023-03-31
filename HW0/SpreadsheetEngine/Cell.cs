@@ -69,7 +69,7 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Gets or sets the text inside the Cell.
         /// </summary>
-        public string Text
+        public virtual string Text
         {
             get
             {
@@ -84,19 +84,25 @@ namespace SpreadsheetEngine
                 }
 
                 this.text = value;
-                if (this.PropertyChanged != null)
-                {
-                    this.PropertyChanged(this, new PropertyChangedEventArgs("Text"));
-                }
             }
         }
 
         /// <summary>
         /// Gets the evaluated value of the Cell.
         /// </summary>
-        public string Value
+        public virtual string Value
         {
             get { return this.value; }
+        }
+
+        /// <summary>
+        /// Notifies that either the Value or Text of a Cell has changed.
+        /// </summary>
+        /// <param name="e">The event of either the Text of Value of a cell changing.</param>
+        protected virtual void OnCellChanged(PropertyChangedEventArgs e)
+        {
+            // Safely raise the event for all subscribers
+            this.PropertyChanged?.Invoke(this, e);
         }
     }
 }

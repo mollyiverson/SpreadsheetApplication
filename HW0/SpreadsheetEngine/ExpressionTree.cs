@@ -130,6 +130,15 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Returns a list of all variables involved in the current expression.
+        /// </summary>
+        /// <returns>A list of string variable names.</returns>
+        public List<string> GetVariables()
+        {
+            return this.variableTable.Keys.ToList();
+        }
+
+        /// <summary>
         /// Determines if a character is alphanumeric.
         /// </summary>
         /// <param name="character">A char.</param>
@@ -313,6 +322,7 @@ namespace SpreadsheetEngine
                             {
                                 VariableNode variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
                                 nodeStack.Push(variableNode);
+                                this.variableTable[element] = 0;
                             }
                             else
                             {

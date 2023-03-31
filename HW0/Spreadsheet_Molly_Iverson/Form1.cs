@@ -54,6 +54,11 @@ namespace Spreadsheet_Molly_Iverson
                 {
                     this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
                 }
+
+                if (e.PropertyName == "Value")
+                {
+                    this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
+                }
             }
         }
 
@@ -154,39 +159,5 @@ namespace Spreadsheet_Molly_Iverson
                 this.Text = msg;
             }
         }
-
-        /// <summary>
-        /// Shows the text cell value to show when hovering over the cell.
-        /// </summary>
-        /// <param name="sender">The hovered over DataGridViewCell.</param>
-        /// <param name="e">Occurs when the mouse is hovering over the cell.</param>
-        //private void DataGridView1_CellMouseEnter(object sender, DataGridViewCellEventArgs e)
-        //{
-        //    if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
-        //    {
-        //        Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
-        //        if (currentCell != null)
-        //        {
-        //            this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
-        //        }
-        //    }
-        //}
-
-        /// <summary>
-        /// The Cell text goes back to its value once the mouse stops hovering over it.
-        /// </summary>
-        /// <param name="sender">The hovered over DataGridViewCell.</param>
-        /// <param name="e">Occurs when the mouse tops hovering over the cell.</param>
-        //private void DataGridView1_CellMouseLeave(object sender, DataGridViewCellEventArgs e)
-        //{
-        //    if (e.RowIndex >= 0 && e.ColumnIndex >= 0)
-        //    {
-        //        Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
-        //        if (currentCell != null)
-        //        {
-        //            this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
-        //        }
-        //    }
-        //}
     }
 }
