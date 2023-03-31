@@ -44,7 +44,13 @@ namespace SpreadsheetEngine
         /// <summary>
         /// Allows the outside project to implement their own way of accessing their private data.
         /// </summary>
-        private Func<string, double> getCellValue;
+        private Func<string, double>? getCellValue;
+
+        /// <summary>
+        /// Determines if the Variable values should come from the ExpressionTree variableTable
+        /// or from the outside project via the getCellValue function.
+        /// </summary>
+        private bool useDictionary;
 
         /// <summary>
         /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
@@ -58,6 +64,21 @@ namespace SpreadsheetEngine
             this.root = null;
             this.operatorNodeFactory = new OperatorNodeFactory();
             this.getCellValue = getCellValue;
+            this.useDictionary = false;
+        }
+
+        /// <summary>
+        /// Initializes a new instance of the <see cref="ExpressionTree"/> class.
+        /// </summary>
+        /// <param name="expression">The math expression with variables, operators, and constants.</param>
+        public ExpressionTree(string expression)
+        {
+            this.expression = expression;
+            this.variableTable = new Dictionary<string, double>();
+            this.root = null;
+            this.operatorNodeFactory = new OperatorNodeFactory();
+            this.useDictionary = true;
+            this.getCellValue = null;
         }
 
         /// <summary>
@@ -78,17 +99,6 @@ namespace SpreadsheetEngine
                     this.variableTable.Clear();
                 }
             }
-        }
-
-        /// <summary>
-        /// Allows outside projects to implement their own function that accesses their own data.
-        /// </summary>
-        /// <param name="variable">The name of the variable being accessed.</param>
-        /// <param name="function">The outside function that gets the data for the variable.</param>
-        /// <returns>The variable's data.</returns>
-        public double LookUpVariable(string variable, Func<string, double> function)
-        {
-            return function(variable);
         }
 
         /// <summary>
@@ -136,6 +146,17 @@ namespace SpreadsheetEngine
             {
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Allows outside projects to implement their own function that accesses their own data.
+        /// </summary>
+        /// <param name="variable">The name of the variable being accessed.</param>
+        /// <param name="function">The outside function that gets the data for the variable.</param>
+        /// <returns>The variable's data.</returns>
+        private double LookUpVariable(string variable, Func<string, double> function)
+        {
+            return function(variable);
         }
 
         /// <summary>
@@ -271,20 +292,33 @@ namespace SpreadsheetEngine
                     }
                     else
                     {
-                        VariableNode variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
-                        nodeStack.Push(variableNode);
                         // We need a VariableNode
-                        //if (this.variableTable.TryGetValue(element, out double value))
-                        //{
-                        //    VariableNode variableNode = new VariableNode(element, value);
-                        //    nodeStack.Push(variableNode);
-                        //}
-                        //else
-                        //{
-                        //    this.variableTable[element] = 0;
-                        //    VariableNode variableNode = new VariableNode(element, 0);
-                        //    nodeStack.Push(variableNode);
-                        //}
+                        if (this.useDictionary)
+                        {
+                            if (this.variableTable.TryGetValue(element, out double value))
+                            {
+                                VariableNode variableNode = new VariableNode(element, value);
+                                nodeStack.Push(variableNode);
+                            }
+                            else
+                            {
+                                this.variableTable[element] = 0;
+                                VariableNode variableNode = new VariableNode(element, 0);
+                                nodeStack.Push(variableNode);
+                            }
+                        }
+                        else
+                        {
+                            if (this.getCellValue != null)
+                            {
+                                VariableNode variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
+                                nodeStack.Push(variableNode);
+                            }
+                            else
+                            {
+                                throw new Exception("Conflict between whether to use ExpressionTree dictionary or get variables from outside source.");
+                            }
+                        }
                     }
                 }
             }
