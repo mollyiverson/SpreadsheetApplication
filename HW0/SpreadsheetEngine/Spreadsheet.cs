@@ -218,7 +218,8 @@ namespace SpreadsheetEngine
                             catch
                             {
                                 // a nonempty/nonvalid cell is referenced
-                                currentCell.ClearList();
+                                currentCell.DependentCells = this.GetDependentCells();
+                                currentCell.Subscribe();
                                 currentCell.Value = string.Empty;
                             }
                         }
@@ -268,8 +269,20 @@ namespace SpreadsheetEngine
                     {
                         string expression = cellText.Substring(1);
                         this.expressionTree.Expression = expression;
-                        double value = this.expressionTree.Evaluate();
-                        currentCell.Value = value + string.Empty;
+                        try
+                        {
+                            double value = this.expressionTree.Evaluate();
+                            currentCell.DependentCells = this.GetDependentCells();
+                            currentCell.Subscribe();
+                            currentCell.Value = value + string.Empty;
+                        }
+                        catch
+                        {
+                            // a nonempty/nonvalid cell is referenced
+                            currentCell.DependentCells = this.GetDependentCells();
+                            currentCell.Subscribe();
+                            currentCell.Value = string.Empty;
+                        }
                     }
                 }
             }
