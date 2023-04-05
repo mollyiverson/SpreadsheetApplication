@@ -157,7 +157,10 @@ namespace SpreadsheetEngine
                 int columnIndex = columnLetter - 65;
                 int rowIndex = int.Parse(rows) - 1;
 
-                dependentCells.Add(this.cellArray[rowIndex, columnIndex]);
+                if((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
+                {
+                    dependentCells.Add(this.cellArray[rowIndex, columnIndex]);
+                }                
             }
 
             return dependentCells;
