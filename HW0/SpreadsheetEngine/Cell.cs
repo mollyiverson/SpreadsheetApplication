@@ -33,6 +33,11 @@ namespace SpreadsheetEngine
         protected string value;
 
         /// <summary>
+        /// Represents the color of the cell.
+        /// </summary>
+        protected uint color;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Cell"/> class.
         /// </summary>
         /// <param name="rowIndex">The cell's row in the spreadsheet.</param>
@@ -43,6 +48,7 @@ namespace SpreadsheetEngine
             this.columnIndex = columnIndex;
             this.text = string.Empty;
             this.value = string.Empty;
+            this.color = 0xFFFFFFFF;
         }
 
         /// <summary>
@@ -93,6 +99,15 @@ namespace SpreadsheetEngine
         public virtual string Value
         {
             get { return this.value; }
+        }
+
+        /// <summary>
+        /// Gets or sets the color of the cell.
+        /// </summary>
+        public virtual uint Color
+        {
+            get { return this.color; }
+            set { this.color = value; }
         }
 
         /// <summary>

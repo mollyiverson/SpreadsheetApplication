@@ -54,10 +54,13 @@ namespace Spreadsheet_Molly_Iverson
                 {
                     this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
                 }
-
-                if (e.PropertyName == "Value")
+                else if (e.PropertyName == "Value")
                 {
                     this.dataGridView1.Rows[row].Cells[column].Value = currentCell.Value;
+                }
+                else if (e.PropertyName == "Color")
+                {
+                    this.dataGridView1.Rows[row].Cells[column].Style.BackColor = Color.FromArgb((int)currentCell.Color);
                 }
             }
         }

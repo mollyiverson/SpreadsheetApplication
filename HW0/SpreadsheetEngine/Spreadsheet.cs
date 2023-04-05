@@ -157,10 +157,10 @@ namespace SpreadsheetEngine
                 int columnIndex = columnLetter - 65;
                 int rowIndex = int.Parse(rows) - 1;
 
-                if((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
+                if ((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
                 {
                     dependentCells.Add(this.cellArray[rowIndex, columnIndex]);
-                }                
+                }
             }
 
             return dependentCells;
@@ -229,6 +229,10 @@ namespace SpreadsheetEngine
                     }
                 }
                 else if (e.PropertyName == "Value")
+                {
+                    this.CellPropertyChanged(sender, e);
+                }
+                else if (e.PropertyName == "Color")
                 {
                     this.CellPropertyChanged(sender, e);
                 }
@@ -392,6 +396,28 @@ namespace SpreadsheetEngine
 
                     this.text = value;
                     base.OnCellChanged(new PropertyChangedEventArgs("Text"));
+                }
+            }
+
+            /// <summary>
+            /// Gets or sets the color of the cell.
+            /// </summary>
+            public override uint Color
+            {
+                get
+                {
+                    return this.color;
+                }
+
+                set
+                {
+                    if (this.color == value)
+                    {
+                        return;
+                    }
+
+                    this.color = value;
+                    base.OnCellChanged(new PropertyChangedEventArgs("Color"));
                 }
             }
 
