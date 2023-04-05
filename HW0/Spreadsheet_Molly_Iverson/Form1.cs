@@ -7,6 +7,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Data;
 using System.Data.Common;
+using System.Diagnostics.Metrics;
 using System.Drawing;
 using System.Linq;
 using System.Text;
@@ -160,6 +161,21 @@ namespace Spreadsheet_Molly_Iverson
 
                 string msg = string.Format("Finished Editing Cell at {0}{1}", Convert.ToChar(e.ColumnIndex + 65), e.RowIndex + 1);
                 this.Text = msg;
+            }
+        }
+
+        /// <summary>
+        /// Changes the background color of selected cells with a color of the user's choosing.
+        /// </summary>
+        /// <param name="sender">The MenuStrip option.</param>
+        /// <param name="e">The change color of cells button is pressed.</param>
+        private void ChangeBackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.colorDialog1.ShowDialog();
+            Color colorChoice = this.colorDialog1.Color;
+            for (int counter = 0; counter < this.dataGridView1.SelectedCells.Count; counter++)
+            {
+                this.dataGridView1.SelectedCells[counter].Style.BackColor = colorChoice;
             }
         }
     }
