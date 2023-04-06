@@ -15,6 +15,7 @@ using System.Threading.Tasks;
 using System.Timers;
 using System.Windows.Forms;
 using SpreadsheetEngine;
+using static System.Windows.Forms.VisualStyles.VisualStyleElement.Window;
 
 namespace Spreadsheet_Molly_Iverson
 {
@@ -37,6 +38,9 @@ namespace Spreadsheet_Molly_Iverson
             this.spreadsheet = new Spreadsheet(50, 26);
             this.spreadsheet.CellPropertyChanged += this.Spreadsheet_PropertyChanged;
             this.InitializeDataGrid();
+
+            this.undoMenuItem.Enabled = false;
+            this.redoMenuItem.Enabled = false;
         }
 
         /// <summary>
@@ -84,6 +88,11 @@ namespace Spreadsheet_Molly_Iverson
             for (int i = 1; i < this.dataGridView1.Rows.Count; i++)
             {
                 this.dataGridView1.Rows[i - 1].HeaderCell.Value = i.ToString();
+            }
+
+            foreach (DataGridViewColumn col in this.dataGridView1.Columns)
+            {
+                col.SortMode = DataGridViewColumnSortMode.NotSortable;
             }
         }
 
@@ -155,7 +164,20 @@ namespace Spreadsheet_Molly_Iverson
                 Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
                 if (currentCell != null)
                 {
-                    this.spreadsheet.AddUndo(currentCell, (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
+                    // Add Undo Command
+                    string oldText = currentCell.Text;
+                    string newNext = (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
+
+                    if (oldText != newNext)
+                    {
+                        this.spreadsheet.AddUndo(currentCell, oldText, newNext);
+
+                        // Change text of undo button
+                        this.undoMenuItem.Text = this.spreadsheet.PeekUndoStackName();
+                        this.undoMenuItem.Enabled = true;
+                    }
+
+                    // Change the cell text
                     currentCell.Text = (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
                     this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
                 }
@@ -172,12 +194,95 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">The change color of cells button is pressed.</param>
         private void ChangeBackgroundColorToolStripMenuItem_Click(object sender, EventArgs e)
         {
-            this.colorDialog1.ShowDialog();
-            Color colorChoice = this.colorDialog1.Color;
-            for (int counter = 0; counter < this.dataGridView1.SelectedCells.Count; counter++)
+            if (this.dataGridView1.SelectedCells.Count >= 1)
             {
-                this.dataGridView1.SelectedCells[counter].Style.BackColor = colorChoice;
+                if (this.colorDialog1.ShowDialog() == DialogResult.OK)
+                {
+                    Color colorChoice = this.colorDialog1.Color;
+                    uint colorToUINT = (uint)colorChoice.ToArgb();
+
+                    // Arguments to make a new undo command
+                    List<Cell> cellList = new List<Cell>();
+                    List<uint> previousColors = new List<uint>();
+
+                    bool colorsChanged = false;
+
+                    for (int counter = 0; counter < this.dataGridView1.SelectedCells.Count; counter++)
+                    {
+                        Cell? currentCell = this.spreadsheet.GetCell(this.dataGridView1.SelectedCells[counter].RowIndex, this.dataGridView1.SelectedCells[counter].ColumnIndex);
+
+                        if (currentCell != null)
+                        {
+                            cellList.Add(currentCell);
+                            previousColors.Add(currentCell.Color);
+
+                            if (currentCell.Color != colorChoice.ToArgb())
+                            {
+                                colorsChanged = true;
+                            }
+
+                            currentCell.Color = colorToUINT;
+                        }
+                    }
+
+                    // It won't make an undo command if none of the colors actually changed. At least one cell has to have a color change.
+                    if (colorsChanged)
+                    {
+                        // Add new Undo command
+                        this.spreadsheet.AddUndo(cellList, previousColors, colorToUINT);
+
+                        // Change text of undo button
+                        this.undoMenuItem.Text = this.spreadsheet.PeekUndoStackName();
+                        this.undoMenuItem.Enabled = true;
+                    }
+                }
             }
+        }
+
+        /// <summary>
+        /// Undoes the most recent command.
+        /// </summary>
+        /// <param name="sender">The MenuStrip undo option.</param>
+        /// <param name="e">The undo button is pushed.</param>
+        private void UndoTextChangesToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.spreadsheet.Undo();
+            if (this.spreadsheet.GetUndoStackSize() == 0)
+            {
+                this.undoMenuItem.Enabled = false;
+                this.undoMenuItem.Text = "Undo";
+            }
+            else
+            {
+                this.undoMenuItem.Enabled = true;
+                this.undoMenuItem.Text = this.spreadsheet.PeekUndoStackName();
+            }
+
+            this.redoMenuItem.Enabled = true;
+            this.redoMenuItem.Text = this.spreadsheet.PeekRedoStackName();
+        }
+
+        /// <summary>
+        /// Redoes the most recent undone command.
+        /// </summary>
+        /// <param name="sender">The MenuStrip redo option.</param>
+        /// <param name="e">The redo button is pushed.</param>
+        private void RedoToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.spreadsheet.Redo();
+            if (this.spreadsheet.GetRedoStackSize() == 0)
+            {
+                this.redoMenuItem.Enabled = false;
+                this.redoMenuItem.Text = "Redo";
+            }
+            else
+            {
+                this.redoMenuItem.Enabled = true;
+                this.redoMenuItem.Text = this.spreadsheet.PeekRedoStackName();
+            }
+
+            this.undoMenuItem.Enabled = true;
+            this.undoMenuItem.Text = this.spreadsheet.PeekUndoStackName();
         }
     }
 }

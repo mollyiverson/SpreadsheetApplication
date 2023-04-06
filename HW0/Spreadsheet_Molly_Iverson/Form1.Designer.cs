@@ -33,8 +33,8 @@
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileOption = new System.Windows.Forms.ToolStripMenuItem();
             this.editOption = new System.Windows.Forms.ToolStripMenuItem();
-            this.undoTextChangesToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.redoToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.undoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.redoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cellOption = new System.Windows.Forms.ToolStripMenuItem();
             this.changeBackgroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
@@ -89,23 +89,25 @@
             // editOption
             // 
             this.editOption.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
-            this.undoTextChangesToolStripMenuItem,
-            this.redoToolStripMenuItem});
+            this.undoMenuItem,
+            this.redoMenuItem});
             this.editOption.Name = "editOption";
             this.editOption.Size = new System.Drawing.Size(58, 29);
             this.editOption.Text = "Edit";
             // 
-            // undoTextChangesToolStripMenuItem
+            // undoMenuItem
             // 
-            this.undoTextChangesToolStripMenuItem.Name = "undoTextChangesToolStripMenuItem";
-            this.undoTextChangesToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.undoTextChangesToolStripMenuItem.Text = "Undo";
+            this.undoMenuItem.Name = "undoMenuItem";
+            this.undoMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.undoMenuItem.Text = "Undo";
+            this.undoMenuItem.Click += new System.EventHandler(this.UndoTextChangesToolStripMenuItem_Click);
             // 
-            // redoToolStripMenuItem
+            // redoMenuItem
             // 
-            this.redoToolStripMenuItem.Name = "redoToolStripMenuItem";
-            this.redoToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.redoToolStripMenuItem.Text = "Redo";
+            this.redoMenuItem.Name = "redoMenuItem";
+            this.redoMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.redoMenuItem.Text = "Redo";
+            this.redoMenuItem.Click += new System.EventHandler(this.RedoToolStripMenuItem_Click);
             // 
             // cellOption
             // 
@@ -149,8 +151,8 @@
         private ToolStripMenuItem fileOption;
         private ToolStripMenuItem editOption;
         private ToolStripMenuItem cellOption;
-        private ToolStripMenuItem undoTextChangesToolStripMenuItem;
-        private ToolStripMenuItem redoToolStripMenuItem;
+        private ToolStripMenuItem undoMenuItem;
+        private ToolStripMenuItem redoMenuItem;
         private ToolStripMenuItem changeBackgroundColorToolStripMenuItem;
         private ColorDialog colorDialog1;
     }

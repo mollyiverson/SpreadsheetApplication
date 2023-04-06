@@ -155,13 +155,81 @@ namespace SpreadsheetEngine
             this.undoStack.Push(colorChange);
         }
 
+        /// <summary>
+        /// Executes the last command undone and adds it to the undo stack.
+        /// </summary>
         public void Redo()
         {
+            if (this.redoStack.Count > 0)
+            {
+                ICommand lastCommand = this.redoStack.Pop();
+                this.undoStack.Push(lastCommand);
+                lastCommand.Execute();
+            }
 
         }
+
+        /// <summary>
+        /// Executes the last command and adds it to the redo stack.
+        /// </summary>
         public void Undo()
         {
+            if (this.undoStack.Count > 0)
+            {
+                ICommand lastCommand = this.undoStack.Pop();
+                this.redoStack.Push(lastCommand);
+                lastCommand.UnExecute();
+            }
+        }
 
+        /// <summary>
+        /// Returns the size of the redo stack.
+        /// </summary>
+        /// <returns>Size of redo stack.</returns>
+        public int GetRedoStackSize()
+        {
+            return this.redoStack.Count();
+        }
+
+        /// <summary>
+        /// Returns the size of the undo stack.
+        /// </summary>
+        /// <returns>Size of undo stack.</returns>
+        public int GetUndoStackSize()
+        {
+            return this.undoStack.Count();
+        }
+
+        /// <summary>
+        /// Gets the undo message of the top element of the undo stack.
+        /// </summary>
+        /// <returns>The undo message.</returns>
+        public string PeekUndoStackName()
+        {
+            if (this.undoStack.Count > 0)
+            {
+                return this.undoStack.Peek().GetUndoMessage();
+            }
+            else
+            {
+                return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Gets the undo message of the top element of the redo stack.
+        /// </summary>
+        /// <returns>The redo message.</returns>
+        public string PeekRedoStackName()
+        {
+            if (this.redoStack.Count > 0)
+            {
+                return this.redoStack.Peek().GetRedoMessage();
+            }
+            else
+            {
+                return string.Empty;
+            }
         }
 
         /// <summary>
@@ -171,22 +239,30 @@ namespace SpreadsheetEngine
         /// <returns>The cell.</returns>
         private Cell? GetCell(string cellName)
         {
-            char columnLetter = cellName[0];
-
-            // Get number of rows as a substring
-            string rows = cellName.Substring(1);
-
-            // Convert
-            int columnIndex = columnLetter - 65;
-            int rowIndex = int.Parse(rows) - 1;
-
-            if ((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
+            try
             {
-                return this.cellArray[rowIndex, columnIndex];
+                char columnLetter = cellName[0];
+
+                // Get number of rows as a substring
+                string rows = cellName.Substring(1);
+
+                // Convert
+                int columnIndex = columnLetter - 65;
+                int rowIndex = int.Parse(rows) - 1;
+
+                if ((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
+                {
+                    return this.cellArray[rowIndex, columnIndex];
+                }
+                else
+                {
+                    return null;
+                }
             }
-            else
+            catch
             {
-                return null;
+                // bad format of variable. Not compatible with spreadsheet
+                throw new Exception("Variable not compatible with Spreadsheet (Columns A-Z, rows 1-50)");
             }
         }
 
@@ -246,7 +322,7 @@ namespace SpreadsheetEngine
                     {
                         if (this.IsOnlyCellReference(cellText))
                         {
-                            Cell? cell = this.GetCell(cellText);
+                            Cell? cell = this.GetCell(cellText.Substring(1));
                             if (cell != null)
                             {
                                 currentCell.DependentCells.Add(cell);
@@ -307,7 +383,7 @@ namespace SpreadsheetEngine
                 {
                     if (this.IsOnlyCellReference(cellText))
                     {
-                        Cell? cell = this.GetCell(cellText);
+                        Cell? cell = this.GetCell(cellText.Substring(1));
 
                         if (cell != null)
                         {
@@ -349,8 +425,17 @@ namespace SpreadsheetEngine
                 // Get number of rows as a substring
                 string rows = expression.Substring(2);
 
+                int rowIndex = 0;
+
                 // Convert
-                int rowIndex = int.Parse(rows) - 1;
+                try
+                {
+                    rowIndex = int.Parse(rows) - 1;
+                }
+                catch
+                {
+                    throw new Exception("Variable not compatible with Spreadsheet (Columns A-Z, rows 1-50)");
+                }
 
                 if (rowIndex >= 0 && rowIndex < this.RowCount)
                 {
