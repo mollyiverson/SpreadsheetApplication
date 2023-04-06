@@ -187,7 +187,7 @@ namespace SpreadsheetEngine
         /// <returns>Size of redo stack.</returns>
         public int GetRedoStackSize()
         {
-            return this.redoStack.Count();
+            return this.redoStack.Count;
         }
 
         /// <summary>
@@ -196,7 +196,7 @@ namespace SpreadsheetEngine
         /// <returns>Size of undo stack.</returns>
         public int GetUndoStackSize()
         {
-            return this.undoStack.Count();
+            return this.undoStack.Count;
         }
 
         /// <summary>
