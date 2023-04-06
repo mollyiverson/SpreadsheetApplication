@@ -38,6 +38,16 @@ namespace SpreadsheetEngine
         private ExpressionTree expressionTree;
 
         /// <summary>
+        /// Used to keep track of actions taken.
+        /// </summary>
+        private Stack<ICommand> undoStack;
+
+        /// <summary>
+        /// Used to keep track of actions undone.
+        /// </summary>
+        private Stack<ICommand> redoStack;
+
+        /// <summary>
         /// Initializes a new instance of the <see cref="Spreadsheet"/> class.
         /// Creates the spreadsheet with specfied dimensions.
         /// </summary>
@@ -164,6 +174,11 @@ namespace SpreadsheetEngine
             }
 
             return dependentCells;
+        }
+
+        public void AddUndo(ICommand command)
+        {
+           throw new NotImplementedException();
         }
 
         /// <summary>

@@ -199,5 +199,51 @@ namespace SpreadsheetApplicationTests
                 Assert.Fail();
             }
         }
+
+        /// <summary>
+        /// Tests the undo function
+        /// </summary>
+        [Test]
+        public void TestUndo()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Text = "Hello";
+                //spreadsheet.AddUndo();
+                //Undo
+                Assert.That(cell.Text, Is.EqualTo(string.Empty)); // Text should not change
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests the redo function.
+        /// </summary>
+        [Test]
+        public void TestRedo()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Text = "Hello";
+                //spreadsheet.AddUndo();
+                //Undo
+
+                Assert.That(cell.Text, Is.EqualTo(string.Empty));
+                // Redo
+
+                Assert.That(cell.Text, Is.EqualTo("Hello"));
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
     }
 }
