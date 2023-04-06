@@ -124,8 +124,11 @@ namespace SpreadsheetApplicationTests
             if (cell != null && cell2 != null)
             {
                 cell2.Text = "=B2";
-                Assert.That(cell2.Value, Is.EqualTo(string.Empty));
-                Assert.That(cell2.Text, Is.EqualTo("=B2")); // Text should not change
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                    Assert.That(cell2.Text, Is.EqualTo("=B2")); // Text should not change
+                });
             }
             else
             {
@@ -144,8 +147,11 @@ namespace SpreadsheetApplicationTests
             if (cell != null)
             {
                 cell.Text = "=B20"; // out of range. Spreadsheet expects 1-based input
-                Assert.That(cell.Value, Is.EqualTo(string.Empty)); // Value should be set to empty string
-                Assert.That(cell.Text, Is.EqualTo("=B20")); // Text should not change
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo(string.Empty)); // Value should be set to empty string
+                    Assert.That(cell.Text, Is.EqualTo("=B20")); // Text should not change
+                });
             }
             else
             {
@@ -168,8 +174,11 @@ namespace SpreadsheetApplicationTests
                 cell.Text = "5";
                 cell2.Text = "=B2";
                 cell3.Text = "=C3 + 1";
-                Assert.That(cell3.Value, Is.EqualTo("6"));
-                Assert.That(cell3.Text, Is.EqualTo("=C3 + 1")); // Text should not change
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell3.Value, Is.EqualTo("6"));
+                    Assert.That(cell3.Text, Is.EqualTo("=C3 + 1")); // Text should not change
+                });
             }
             else
             {
@@ -191,8 +200,11 @@ namespace SpreadsheetApplicationTests
             {
                 cell.Text = "Hello";
                 cell2.Text = "=B2 + 1";
-                Assert.That(cell2.Value, Is.EqualTo(string.Empty));
-                Assert.That(cell2.Text, Is.EqualTo("=B2 + 1")); // Text should not change
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                    Assert.That(cell2.Text, Is.EqualTo("=B2 + 1")); // Text should not change
+                });
             }
             else
             {
@@ -201,7 +213,7 @@ namespace SpreadsheetApplicationTests
         }
 
         /// <summary>
-        /// Tests the undo function
+        /// Tests the undo function.
         /// </summary>
         [Test]
         public void TestUndo()
@@ -211,9 +223,13 @@ namespace SpreadsheetApplicationTests
             if (cell != null)
             {
                 cell.Text = "Hello";
-                //spreadsheet.AddUndo();
-                //Undo
-                Assert.That(cell.Text, Is.EqualTo(string.Empty)); // Text should not change
+                spreadsheet.AddUndo(cell, string.Empty, "Hello");
+                spreadsheet.Undo();
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Text, Is.EqualTo(string.Empty));
+                    Assert.That(spreadsheet.GetRedoStackSize(), Is.EqualTo(1));
+                });
             }
             else
             {
@@ -232,12 +248,14 @@ namespace SpreadsheetApplicationTests
             if (cell != null)
             {
                 cell.Text = "Hello";
-                //spreadsheet.AddUndo();
-                //Undo
 
+                // Undo
+                spreadsheet.AddUndo(cell, string.Empty, "Hello");
+                spreadsheet.Undo();
                 Assert.That(cell.Text, Is.EqualTo(string.Empty));
-                // Redo
 
+                // Redo
+                spreadsheet.Redo();
                 Assert.That(cell.Text, Is.EqualTo("Hello"));
             }
             else

@@ -166,7 +166,6 @@ namespace SpreadsheetEngine
                 this.undoStack.Push(lastCommand);
                 lastCommand.Execute();
             }
-
         }
 
         /// <summary>
@@ -302,9 +301,7 @@ namespace SpreadsheetEngine
         /// <param name="e">Event where cell is changed.</param>
         private void SCell_PropertyChanged(object? sender, PropertyChangedEventArgs e)
         {
-            SCell? currentCell = sender as SCell;
-
-            if (currentCell != null)
+            if (sender is SCell currentCell)
             {
                 if (e.PropertyName == "Text")
                 {
@@ -370,9 +367,7 @@ namespace SpreadsheetEngine
         /// <param name="e">Event where a refenced cell has changed.</param>
         private void SCell_Maybe_PropertyChanged(object? sender, EventArgs e)
         {
-            SCell? currentCell = sender as SCell;
-
-            if (currentCell != null)
+            if (sender is SCell currentCell)
             {
                 string cellText = currentCell.Text;
                 if (cellText[0] != '=')
@@ -425,7 +420,7 @@ namespace SpreadsheetEngine
                 // Get number of rows as a substring
                 string rows = expression.Substring(2);
 
-                int rowIndex = 0;
+                int rowIndex;
 
                 // Convert
                 try
