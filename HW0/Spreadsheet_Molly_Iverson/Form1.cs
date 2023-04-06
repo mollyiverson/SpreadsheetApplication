@@ -155,6 +155,7 @@ namespace Spreadsheet_Molly_Iverson
                 Cell? currentCell = this.spreadsheet.GetCell(e.RowIndex, e.ColumnIndex);
                 if (currentCell != null)
                 {
+                    this.spreadsheet.AddUndo(currentCell, (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value);
                     currentCell.Text = (string)this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value;
                     this.dataGridView1.Rows[e.RowIndex].Cells[e.ColumnIndex].Value = currentCell.Value;
                 }

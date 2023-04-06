@@ -55,7 +55,9 @@ namespace SpreadsheetEngine
         /// <param name="columns">The number of columns in the spreadsheet.</param>
         public Spreadsheet(int rows, int columns)
         {
-            this.expressionTree = new ExpressionTree(string.Empty, this.GetCellValue);
+            this.expressionTree = new ExpressionTree(string.Empty, this.GetCellValueFromName);
+            this.undoStack = new Stack<ICommand>();
+            this.redoStack = new Stack<ICommand>();
             this.rowCount = rows;
             this.columnCount = columns;
             this.cellArray = new SCell[rows, columns];
@@ -92,46 +94,6 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
-        /// This function will be referenced in the ExpressionTree class when it needs to
-        /// access a variable.
-        /// </summary>
-        /// <param name="cellName">The Cell name (i.e. B3).</param>
-        /// <returns>The evaluated value of the expression/cell.</returns>
-        /// <exception cref="Exception">Throws an exception if GetCell is called with out of range data.</exception>
-        public double GetCellValue(string cellName)
-        {
-            // Get the letter column
-            char columnLetter = cellName[0];
-
-            // Get number of rows as a substring
-            string rows = cellName.Substring(1);
-
-            // Convert
-            int columnIndex = columnLetter - 65;
-            int rowIndex = int.Parse(rows) - 1;
-
-            Cell? currentCell = this.GetCell(rowIndex, columnIndex);
-            if (currentCell == null)
-            {
-                throw new Exception("GetCell: requesting a cell out of range.");
-            }
-            else
-            {
-                string cellValue = currentCell.Value;
-                try
-                {
-                    double answer = Convert.ToDouble(cellValue);
-                    return answer;
-                }
-                catch (System.FormatException ex)
-                {
-                    Console.WriteLine(ex.Message);
-                    throw new Exception("Cannot reference an empty cell.");
-                }
-            }
-        }
-
-        /// <summary>
         /// Takes a row and column index and returns the cell at that location
         /// or null if there is no such cell.
         /// </summary>
@@ -158,27 +120,103 @@ namespace SpreadsheetEngine
             List<Cell> dependentCells = new List<Cell>();
             foreach (string cellName in cells)
             {
-                char columnLetter = cellName[0];
+                Cell? cell = this.GetCell(cellName);
 
-                // Get number of rows as a substring
-                string rows = cellName.Substring(1);
-
-                // Convert
-                int columnIndex = columnLetter - 65;
-                int rowIndex = int.Parse(rows) - 1;
-
-                if ((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
+                if (cell != null)
                 {
-                    dependentCells.Add(this.cellArray[rowIndex, columnIndex]);
+                    dependentCells.Add(cell);
                 }
             }
 
             return dependentCells;
         }
 
-        public void AddUndo(ICommand command)
+        /// <summary>
+        /// Adds a text change command to the UndoStack.
+        /// </summary>
+        /// <param name="cell">The cell whose text changed.</param>
+        /// <param name="oldText">The old text of the cell.</param>
+        /// <param name="newText">The new text of the cell.</param>
+        public void AddUndo(Cell cell, string oldText, string newText)
         {
-           throw new NotImplementedException();
+            TextChangeCommand textChange = new TextChangeCommand(cell, oldText, newText);
+            this.undoStack.Push(textChange);
+        }
+
+        /// <summary>
+        /// Adds a color change command to the UndoStack.
+        /// </summary>
+        /// <param name="newColorCells">The cells whose color changed.</param>
+        /// <param name="previousColors">The old colors of the cells.</param>
+        /// <param name="color">The new color of the cells.</param>
+        public void AddUndo(List<Cell> newColorCells, List<uint> previousColors, uint color)
+        {
+            ColorChangeCommand colorChange = new ColorChangeCommand(newColorCells, previousColors, color);
+            this.undoStack.Push(colorChange);
+        }
+
+        public void Redo()
+        {
+
+        }
+        public void Undo()
+        {
+
+        }
+
+        /// <summary>
+        /// Retrieves the cell using the name of the cell (i.e. A3).
+        /// </summary>
+        /// <param name="cellName">Name of cell.</param>
+        /// <returns>The cell.</returns>
+        private Cell? GetCell(string cellName)
+        {
+            char columnLetter = cellName[0];
+
+            // Get number of rows as a substring
+            string rows = cellName.Substring(1);
+
+            // Convert
+            int columnIndex = columnLetter - 65;
+            int rowIndex = int.Parse(rows) - 1;
+
+            if ((columnIndex >= 0 && columnIndex < this.columnCount) && (rowIndex >= 0 && rowIndex < this.rowCount))
+            {
+                return this.cellArray[rowIndex, columnIndex];
+            }
+            else
+            {
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// This function will be referenced in the ExpressionTree class when it needs to
+        /// access a variable.
+        /// </summary>
+        /// <param name="cellName">The Cell name (i.e. B3).</param>
+        /// <returns>The evaluated value of the expression/cell.</returns>
+        /// <exception cref="Exception">Throws an exception if GetCell is called with out of range data.</exception>
+        private double GetCellValueFromName(string cellName)
+        {
+            Cell? currentCell = this.GetCell(cellName);
+            if (currentCell == null)
+            {
+                throw new Exception("GetCell: requesting a cell out of range.");
+            }
+            else
+            {
+                string cellValue = currentCell.Value;
+                try
+                {
+                    double answer = Convert.ToDouble(cellValue);
+                    return answer;
+                }
+                catch (System.FormatException)
+                {
+                    throw new Exception("Cannot reference an empty cell.");
+                }
+            }
         }
 
         /// <summary>
@@ -208,19 +246,13 @@ namespace SpreadsheetEngine
                     {
                         if (this.IsOnlyCellReference(cellText))
                         {
-                            // Get the letter column
-                            char columnLetter = cellText[1];
-
-                            // Get number of rows as a substring
-                            string rows = cellText.Substring(2);
-
-                            // Convert
-                            int columnIndex = columnLetter - 65;
-                            int rowIndex = int.Parse(rows) - 1;
-
-                            currentCell.DependentCells.Add(this.cellArray[rowIndex, columnIndex]);
-                            currentCell.Subscribe();
-                            currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
+                            Cell? cell = this.GetCell(cellText);
+                            if (cell != null)
+                            {
+                                currentCell.DependentCells.Add(cell);
+                                currentCell.Subscribe();
+                                currentCell.Value = cell.Value;
+                            }
                         }
                         else
                         {
@@ -275,17 +307,12 @@ namespace SpreadsheetEngine
                 {
                     if (this.IsOnlyCellReference(cellText))
                     {
-                        // Get the letter column
-                        char columnLetter = cellText[1];
+                        Cell? cell = this.GetCell(cellText);
 
-                        // Get number of rows as a substring
-                        string rows = cellText.Substring(2);
-
-                        // Convert
-                        int columnIndex = columnLetter - 65;
-                        int rowIndex = int.Parse(rows) - 1;
-
-                        currentCell.Value = this.cellArray[rowIndex, columnIndex].Value;
+                        if (cell != null)
+                        {
+                            currentCell.Value = cell.Value;
+                        }
                     }
                     else
                     {
