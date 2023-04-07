@@ -265,6 +265,7 @@ namespace SpreadsheetEngine
         /// <returns>ExpressionTree.</returns>
         private Node? ConvertPostfixToTree(string postfixString)
         {
+            bool invalidVariableRef = false;
             string[] elements = System.Text.RegularExpressions.Regex.Split(postfixString, @"\s+");
             if (string.IsNullOrEmpty(postfixString))
             {
@@ -320,7 +321,17 @@ namespace SpreadsheetEngine
                         {
                             if (this.getCellValue != null)
                             {
-                                VariableNode variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
+                                VariableNode variableNode;
+                                try
+                                {
+                                    variableNode = new VariableNode(element, this.LookUpVariable(element, this.getCellValue));
+                                }
+                                catch
+                                {
+                                    variableNode = new VariableNode(element, 0);
+                                    invalidVariableRef = true;
+                                }
+
                                 nodeStack.Push(variableNode);
                                 this.variableTable[element] = 0;
                             }
@@ -333,7 +344,14 @@ namespace SpreadsheetEngine
                 }
             }
 
-            return nodeStack.Pop();
+            if (invalidVariableRef == true)
+            {
+                return null;
+            }
+            else
+            {
+                return nodeStack.Pop();
+            }
         }
     }
 }
