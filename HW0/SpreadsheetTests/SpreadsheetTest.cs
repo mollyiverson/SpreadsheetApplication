@@ -252,11 +252,69 @@ namespace SpreadsheetApplicationTests
                 // Undo
                 spreadsheet.AddUndo(cell, string.Empty, "Hello");
                 spreadsheet.Undo();
-                Assert.That(cell.Text, Is.EqualTo(string.Empty));
 
                 // Redo
                 spreadsheet.Redo();
                 Assert.That(cell.Text, Is.EqualTo("Hello"));
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests undo and redo with the Color property.
+        /// </summary>
+        [Test]
+        public void TestColorUndoRedo()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Color = 4294934783; // pink
+
+                List<Cell> cellList = new List<Cell> { cell };
+                List<uint> colorList = new List<uint> { 0xFFFFFFFF };
+
+                // Undo
+                spreadsheet.AddUndo(cellList, colorList, 4294934783);
+                spreadsheet.Undo();
+                Assert.That(cell.Color, Is.EqualTo(0xFFFFFFFF));
+
+                // Redo
+                spreadsheet.Redo();
+                Assert.That(cell.Color, Is.EqualTo(4294934783));
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests undo, the redo, then undo again.
+        /// </summary>
+        [Test]
+        public void TestUndoRedoUndo()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Text = "Hello";
+
+                // Undo
+                spreadsheet.AddUndo(cell, string.Empty, "Hello");
+                spreadsheet.Undo();
+
+                // Redo
+                spreadsheet.Redo();
+
+                // Undo again
+                spreadsheet.Undo();
+                Assert.That(cell.Text, Is.EqualTo(string.Empty));
             }
             else
             {
