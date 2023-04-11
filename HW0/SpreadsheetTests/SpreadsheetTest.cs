@@ -321,5 +321,29 @@ namespace SpreadsheetApplicationTests
                 Assert.Fail();
             }
         }
+
+        /// <summary>
+        /// Tests the Save and Load functionality.
+        /// </summary>
+        [Test]
+        public void TestSaveAndLoad()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Text = "Hello";
+
+                // SAVE SPREADSHEET
+                cell.Text = "Goodbye";
+
+                // LOAD SPREADSHEET
+                Assert.That(cell.Text, Is.EqualTo("Hello"));
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
     }
 }
