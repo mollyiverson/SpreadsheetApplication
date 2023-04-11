@@ -302,7 +302,9 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">The load button is pressed.</param>
         private void LoadSpreadsheet_Click(object sender, EventArgs e)
         {
-
+            this.spreadsheet.ClearSpreadsheet();
+            this.spreadsheet.ClearUndoStack();
+            this.spreadsheet.ClearRedoStack();
         }
     }
 }

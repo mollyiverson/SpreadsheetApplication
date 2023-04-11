@@ -94,6 +94,22 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Clears all data from the spreadsheet.
+        /// </summary>
+        public void ClearSpreadsheet()
+        {
+            for (int i = 0; i < this.rowCount; i++)
+            {
+                for (int j = 0; j < this.columnCount; j++)
+                {
+                    this.cellArray[i, j].Text = string.Empty;
+                    this.cellArray[i, j].Color = 0xFFFFFFFF;
+                    this.cellArray[i, j].ClearList();
+                }
+            }
+        }
+
+        /// <summary>
         /// Takes a row and column index and returns the cell at that location
         /// or null if there is no such cell.
         /// </summary>
@@ -229,6 +245,22 @@ namespace SpreadsheetEngine
             {
                 return string.Empty;
             }
+        }
+
+        /// <summary>
+        /// Clears the redo stack.
+        /// </summary>
+        public void ClearRedoStack()
+        {
+            this.redoStack.Clear();
+        }
+
+        /// <summary>
+        /// Clears the undo stack.
+        /// </summary>
+        public void ClearUndoStack()
+        {
+            this.undoStack.Clear();
         }
 
         /// <summary>
