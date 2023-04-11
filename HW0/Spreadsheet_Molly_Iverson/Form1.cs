@@ -284,5 +284,25 @@ namespace Spreadsheet_Molly_Iverson
             this.undoMenuItem.Enabled = true;
             this.undoMenuItem.Text = this.spreadsheet.PeekUndoStackName();
         }
+
+        /// <summary>
+        /// Saves the spreasheet data to an XML file.
+        /// </summary>
+        /// <param name="sender">The MenuStrip save option.</param>
+        /// <param name="e">The save button is pressed.</param>
+        private void SaveSpreadsheet_Click(object sender, EventArgs e)
+        {
+
+        }
+
+        /// <summary>
+        /// Loads spreadsheet data from an XML file.
+        /// </summary>
+        /// <param name="sender">The MenuStrip load option.</param>
+        /// <param name="e">The load button is pressed.</param>
+        private void LoadSpreadsheet_Click(object sender, EventArgs e)
+        {
+
+        }
     }
 }
