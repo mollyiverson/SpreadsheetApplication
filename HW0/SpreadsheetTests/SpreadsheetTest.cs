@@ -345,5 +345,24 @@ namespace SpreadsheetApplicationTests
                 Assert.Fail();
             }
         }
+
+        /// <summary>
+        /// Tests loading a spreadsheet from an XML file with extra tags.
+        /// </summary>
+        [Test]
+        public void TestLoadPoorFormatXML()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                // Load SpreadsheetData.xml
+                Assert.That(cell.Text, Is.EqualTo("=A1+6"));
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
     }
 }
