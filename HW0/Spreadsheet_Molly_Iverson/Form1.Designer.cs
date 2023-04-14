@@ -34,6 +34,7 @@
             this.fileOption = new System.Windows.Forms.ToolStripMenuItem();
             this.saveSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.loadSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editOption = new System.Windows.Forms.ToolStripMenuItem();
             this.undoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
@@ -42,7 +43,6 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
-            this.clearSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -109,6 +109,13 @@
             this.loadSpreadsheetToolStripMenuItem.Text = "Load spreadsheet";
             this.loadSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.LoadSpreadsheet_Click);
             // 
+            // clearSpreadsheetToolStripMenuItem
+            // 
+            this.clearSpreadsheetToolStripMenuItem.Name = "clearSpreadsheetToolStripMenuItem";
+            this.clearSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.clearSpreadsheetToolStripMenuItem.Text = "Clear spreadsheet";
+            this.clearSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.ClearSpreadsheetToolStripMenuItem_Click);
+            // 
             // editOption
             // 
             this.editOption.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -153,14 +160,7 @@
             // 
             // saveFileDialog1
             // 
-            this.saveFileDialog1.Filter = "\"XML Files (*.xml)|*.xml\"";
-            // 
-            // clearSpreadsheetToolStripMenuItem
-            // 
-            this.clearSpreadsheetToolStripMenuItem.Name = "clearSpreadsheetToolStripMenuItem";
-            this.clearSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.clearSpreadsheetToolStripMenuItem.Text = "Clear spreadsheet";
-            this.clearSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.ClearSpreadsheetToolStripMenuItem_Click);
+            this.saveFileDialog1.Filter = "XML Files (*.xml)|*.xml";
             // 
             // Form1
             // 

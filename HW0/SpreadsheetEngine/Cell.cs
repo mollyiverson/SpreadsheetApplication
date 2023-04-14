@@ -111,6 +111,15 @@ namespace SpreadsheetEngine
         }
 
         /// <summary>
+        /// Returns whether the cell's properties have been changed from their default values.
+        /// </summary>
+        /// <returns>Whether the cell has been changed.</returns>
+        public bool HasCellBeenChanged()
+        {
+            return this.color != 0xFFFFFFFF || this.text != string.Empty;
+        }
+
+        /// <summary>
         /// Notifies that either the Value or Text of a Cell has changed.
         /// </summary>
         /// <param name="e">The event of either the Text of Value of a cell changing.</param>

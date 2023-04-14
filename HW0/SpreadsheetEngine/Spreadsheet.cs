@@ -338,6 +338,37 @@ namespace SpreadsheetEngine
         /// <param name="stream">The file to be saved to.</param>
         public void SaveToXML(Stream stream)
         {
+            XmlWriterSettings settings = new XmlWriterSettings();
+
+            using (XmlWriter writer = XmlWriter.Create(stream, settings))
+            {
+                writer.WriteStartElement("spreadsheet");
+                foreach (var cell in this.cellArray)
+                {
+                    if (cell.HasCellBeenChanged())
+                    {
+                        writer.WriteStartElement("cell");
+
+                        int row = cell.RowIndex;
+                        int col = cell.ColumnIndex + 'A';
+                        string cellName = ((char)col).ToString() + (row + 1).ToString();
+
+                        writer.WriteAttributeString("name", cellName);
+
+                        writer.WriteStartElement("bgcolor");
+                        writer.WriteString(cell.Color.ToString("X8"));
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("text");
+                        writer.WriteString(cell.Text);
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+                }
+
+                writer.WriteEndElement();
+            }
         }
 
         /// <summary>
