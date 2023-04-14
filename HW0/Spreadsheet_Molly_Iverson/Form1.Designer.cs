@@ -42,6 +42,7 @@
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
+            this.clearSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -88,7 +89,8 @@
             // 
             this.fileOption.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
             this.saveSpreadsheetToolStripMenuItem,
-            this.loadSpreadsheetToolStripMenuItem});
+            this.loadSpreadsheetToolStripMenuItem,
+            this.clearSpreadsheetToolStripMenuItem});
             this.fileOption.Name = "fileOption";
             this.fileOption.Size = new System.Drawing.Size(54, 29);
             this.fileOption.Text = "File";
@@ -96,14 +98,14 @@
             // saveSpreadsheetToolStripMenuItem
             // 
             this.saveSpreadsheetToolStripMenuItem.Name = "saveSpreadsheetToolStripMenuItem";
-            this.saveSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(254, 34);
+            this.saveSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.saveSpreadsheetToolStripMenuItem.Text = "Save spreadsheet";
             this.saveSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.SaveSpreadsheet_Click);
             // 
             // loadSpreadsheetToolStripMenuItem
             // 
             this.loadSpreadsheetToolStripMenuItem.Name = "loadSpreadsheetToolStripMenuItem";
-            this.loadSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(254, 34);
+            this.loadSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
             this.loadSpreadsheetToolStripMenuItem.Text = "Load spreadsheet";
             this.loadSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.LoadSpreadsheet_Click);
             // 
@@ -153,6 +155,13 @@
             // 
             this.saveFileDialog1.Filter = "\"XML Files (*.xml)|*.xml\"";
             // 
+            // clearSpreadsheetToolStripMenuItem
+            // 
+            this.clearSpreadsheetToolStripMenuItem.Name = "clearSpreadsheetToolStripMenuItem";
+            this.clearSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.clearSpreadsheetToolStripMenuItem.Text = "Clear spreadsheet";
+            this.clearSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.ClearSpreadsheetToolStripMenuItem_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(10F, 25F);
@@ -188,5 +197,6 @@
         private ToolStripMenuItem loadSpreadsheetToolStripMenuItem;
         private OpenFileDialog openFileDialog1;
         private SaveFileDialog saveFileDialog1;
+        private ToolStripMenuItem clearSpreadsheetToolStripMenuItem;
     }
 }

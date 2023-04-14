@@ -327,5 +327,15 @@ namespace Spreadsheet_Molly_Iverson
                 fileStream.Close();
             }
         }
+
+        /// <summary>
+        /// Clears the spreadsheet data.
+        /// </summary>
+        /// <param name="sender">The Menustrip clear spreadsheet item.</param>
+        /// <param name="e">Menustrip clear spreadsheet option is pressed.</param>
+        private void ClearSpreadsheetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.spreadsheet.ClearSpreadsheet();
+        }
     }
 }
