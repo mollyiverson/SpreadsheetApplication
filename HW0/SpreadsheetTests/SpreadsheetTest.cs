@@ -1,6 +1,7 @@
 // <copyright file="SpreadsheetTest.cs" company="Molly Iverson:11775649">
 // Copyright (c) Molly Iverson:11775649. All rights reserved.
 // </copyright>
+using System.Drawing;
 using System.Reflection;
 using SpreadsheetEngine;
 
@@ -315,6 +316,88 @@ namespace SpreadsheetApplicationTests
                 // Undo again
                 spreadsheet.Undo();
                 Assert.That(cell.Text, Is.EqualTo(string.Empty));
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests the Save and Load functionality. Saves an XML file and loads it after.
+        /// </summary>
+        [Test]
+        public void TestSaveAndLoad()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+
+            string filename = "RegularData.xml";
+            string path = Path.Combine(AppContext.BaseDirectory, filename);
+
+            // Saves the spreadsheet to an XML file
+            using (FileStream f = File.OpenWrite(path))
+            {
+                Cell? cell1 = spreadsheet.GetCell(0, 1); // B1
+                Cell? cell2 = spreadsheet.GetCell(0, 0); // A1
+                if (cell1 != null && cell2 != null)
+                {
+                    cell1.Text = "cat";
+                    cell2.Text = "dog";
+                    cell1.Color = 0xFF8000FF;
+
+                    spreadsheet.SaveToXML(f);
+                }
+                else
+                {
+                    Assert.Fail();
+                }
+            }
+
+            spreadsheet.ClearSpreadsheet();
+
+            // Loads the XML file
+            using (FileStream f = File.OpenRead(path))
+            {
+                spreadsheet.LoadFromXML(f);
+
+                Cell? cell1 = spreadsheet.GetCell(0, 1); // B1
+                Cell? cell2 = spreadsheet.GetCell(0, 0); // A1
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell1?.Text, Is.EqualTo("cat"));
+                    Assert.That(cell1?.Color, Is.EqualTo(Convert.ToUInt32("FF8000FF", 16)));
+                    Assert.That(cell2?.Text, Is.EqualTo("dog"));
+                    Assert.That(cell2?.Color, Is.EqualTo(Convert.ToUInt32("FFFFFFFF", 16)));
+                });
+            }
+        }
+
+        /// <summary>
+        /// Tests loading a spreadsheet from an XML file with extra tags. Switches the order for text and color.
+        /// </summary>
+        [Test]
+        public void TestLoadExtraTagsXML()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+
+            string filename = "ExtraTags.xml";
+            string path = Path.Combine(AppContext.BaseDirectory, filename);
+
+            FileStream f = File.OpenRead(path);
+
+            spreadsheet.LoadFromXML(f);
+
+            Cell? cell1 = spreadsheet.GetCell(0, 1); // B1
+            Cell? cell2 = spreadsheet.GetCell(0, 0); // A1
+            if (cell1 != null && cell2 != null)
+            {
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell1.Text, Is.EqualTo("hello"));
+                    Assert.That(cell1.Color, Is.EqualTo(Convert.ToUInt32("FFFF80C0", 16)));
+                    Assert.That(cell2.Text, Is.EqualTo("=8"));
+                    Assert.That(cell2.Color, Is.EqualTo(Convert.ToUInt32("FF8000FF", 16)));
+                });
             }
             else
             {

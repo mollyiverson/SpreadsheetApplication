@@ -5,10 +5,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SpreadsheetEngine
 {
@@ -91,6 +96,22 @@ namespace SpreadsheetEngine
         public int ColumnCount
         {
             get { return this.columnCount; }
+        }
+
+        /// <summary>
+        /// Clears all data from the spreadsheet.
+        /// </summary>
+        public void ClearSpreadsheet()
+        {
+            for (int i = 0; i < this.rowCount; i++)
+            {
+                for (int j = 0; j < this.columnCount; j++)
+                {
+                    this.cellArray[i, j].Text = string.Empty;
+                    this.cellArray[i, j].Color = 0xFFFFFFFF;
+                    this.cellArray[i, j].ClearList();
+                }
+            }
         }
 
         /// <summary>
@@ -228,6 +249,129 @@ namespace SpreadsheetEngine
             else
             {
                 return string.Empty;
+            }
+        }
+
+        /// <summary>
+        /// Clears the redo stack.
+        /// </summary>
+        public void ClearRedoStack()
+        {
+            this.redoStack.Clear();
+        }
+
+        /// <summary>
+        /// Clears the undo stack.
+        /// </summary>
+        public void ClearUndoStack()
+        {
+            this.undoStack.Clear();
+        }
+
+        /// <summary>
+        /// Loads an XML file and converts the data to a new spreasheet.
+        /// </summary>
+        /// <param name="stream">The XML file.</param>
+        public void LoadFromXML(Stream stream)
+        {
+            this.ClearRedoStack();
+            this.ClearUndoStack();
+            this.ClearSpreadsheet();
+
+            XmlReaderSettings settings = new XmlReaderSettings()
+            {
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+            };
+
+            XmlReader reader = XmlReader.Create(stream, settings);
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    // if it is a cell, read its data
+                    if (reader.Name == "cell")
+                    {
+                        string? cellName = reader.GetAttribute("name");
+                        if (cellName != null)
+                        {
+                            Cell? newCell = this.GetCell(cellName);
+
+                            if (newCell != null)
+                            {
+                                reader.Read();
+                                while (reader.ReadState != ReadState.EndOfFile && reader.Name != "cell")
+                                {
+                                    // Read the text element
+                                    if (reader.Name == "text")
+                                    {
+                                        reader.Read();
+                                        string text = reader.Value;
+                                        newCell.Text = text;
+                                        if (text != string.Empty)
+                                        {
+                                            reader.Read();
+                                        }
+
+                                        reader.Read();
+                                    }
+
+                                    // Read the color element
+                                    else if (reader.Name == "bgcolor")
+                                    {
+                                        string color = reader.ReadElementContentAsString();
+                                        uint result = Convert.ToUInt32(color, 16);
+                                        newCell.Color = result;
+                                    }
+                                    else
+                                    {
+                                        reader.Read();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Saves the spreadsheet data into an XML file.
+        /// </summary>
+        /// <param name="stream">The file to be saved to.</param>
+        public void SaveToXML(Stream stream)
+        {
+            XmlWriterSettings settings = new XmlWriterSettings();
+
+            using (XmlWriter writer = XmlWriter.Create(stream, settings))
+            {
+                writer.WriteStartElement("spreadsheet");
+                foreach (var cell in this.cellArray)
+                {
+                    if (cell.HasCellBeenChanged())
+                    {
+                        writer.WriteStartElement("cell");
+
+                        int row = cell.RowIndex;
+                        int col = cell.ColumnIndex + 'A';
+                        string cellName = ((char)col).ToString() + (row + 1).ToString();
+
+                        writer.WriteAttributeString("name", cellName);
+
+                        writer.WriteStartElement("bgcolor");
+                        writer.WriteString(cell.Color.ToString("X8"));
+                        writer.WriteEndElement();
+
+                        writer.WriteStartElement("text");
+                        writer.WriteString(cell.Text);
+                        writer.WriteEndElement();
+
+                        writer.WriteEndElement();
+                    }
+                }
+
+                writer.WriteEndElement();
             }
         }
 

@@ -65,6 +65,7 @@ namespace Spreadsheet_Molly_Iverson
                 }
                 else if (e.PropertyName == "Color")
                 {
+                    Color x = Color.FromArgb((int)currentCell.Color);
                     this.dataGridView1.Rows[row].Cells[column].Style.BackColor = Color.FromArgb((int)currentCell.Color);
                 }
             }
@@ -283,6 +284,54 @@ namespace Spreadsheet_Molly_Iverson
 
             this.undoMenuItem.Enabled = true;
             this.undoMenuItem.Text = this.spreadsheet.PeekUndoStackName();
+        }
+
+        /// <summary>
+        /// Saves the spreasheet data to an XML file.
+        /// </summary>
+        /// <param name="sender">The MenuStrip save option.</param>
+        /// <param name="e">The save button is pressed.</param>
+        private void SaveSpreadsheet_Click(object sender, EventArgs e)
+        {
+            Stream fileStream;
+            this.saveFileDialog1.InitialDirectory = AppContext.BaseDirectory;
+
+            // this.saveFileDialog1.InitialDirectory = AppContext.BaseDirectory;
+            if (this.saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if ((fileStream = this.saveFileDialog1.OpenFile()) != null)
+                {
+                    this.spreadsheet.SaveToXML(fileStream);
+                    fileStream.Close();
+                }
+            }
+        }
+
+        /// <summary>
+        /// Loads spreadsheet data from an XML file.
+        /// </summary>
+        /// <param name="sender">The MenuStrip load option.</param>
+        /// <param name="e">The load button is pressed.</param>
+        private void LoadSpreadsheet_Click(object sender, EventArgs e)
+        {
+            this.openFileDialog1.InitialDirectory = AppContext.BaseDirectory;
+
+            if (this.openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                Stream fileStream = this.openFileDialog1.OpenFile();
+                this.spreadsheet.LoadFromXML(fileStream);
+                fileStream.Close();
+            }
+        }
+
+        /// <summary>
+        /// Clears the spreadsheet data.
+        /// </summary>
+        /// <param name="sender">The Menustrip clear spreadsheet item.</param>
+        /// <param name="e">Menustrip clear spreadsheet option is pressed.</param>
+        private void ClearSpreadsheetToolStripMenuItem_Click(object sender, EventArgs e)
+        {
+            this.spreadsheet.ClearSpreadsheet();
         }
     }
 }

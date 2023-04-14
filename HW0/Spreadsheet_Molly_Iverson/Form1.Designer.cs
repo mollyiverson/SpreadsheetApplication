@@ -32,12 +32,17 @@
             this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileOption = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.clearSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editOption = new System.Windows.Forms.ToolStripMenuItem();
             this.undoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cellOption = new System.Windows.Forms.ToolStripMenuItem();
             this.changeBackgroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -82,9 +87,34 @@
             // 
             // fileOption
             // 
+            this.fileOption.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.saveSpreadsheetToolStripMenuItem,
+            this.loadSpreadsheetToolStripMenuItem,
+            this.clearSpreadsheetToolStripMenuItem});
             this.fileOption.Name = "fileOption";
             this.fileOption.Size = new System.Drawing.Size(54, 29);
             this.fileOption.Text = "File";
+            // 
+            // saveSpreadsheetToolStripMenuItem
+            // 
+            this.saveSpreadsheetToolStripMenuItem.Name = "saveSpreadsheetToolStripMenuItem";
+            this.saveSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.saveSpreadsheetToolStripMenuItem.Text = "Save spreadsheet";
+            this.saveSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.SaveSpreadsheet_Click);
+            // 
+            // loadSpreadsheetToolStripMenuItem
+            // 
+            this.loadSpreadsheetToolStripMenuItem.Name = "loadSpreadsheetToolStripMenuItem";
+            this.loadSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.loadSpreadsheetToolStripMenuItem.Text = "Load spreadsheet";
+            this.loadSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.LoadSpreadsheet_Click);
+            // 
+            // clearSpreadsheetToolStripMenuItem
+            // 
+            this.clearSpreadsheetToolStripMenuItem.Name = "clearSpreadsheetToolStripMenuItem";
+            this.clearSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.clearSpreadsheetToolStripMenuItem.Text = "Clear spreadsheet";
+            this.clearSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.ClearSpreadsheetToolStripMenuItem_Click);
             // 
             // editOption
             // 
@@ -98,14 +128,14 @@
             // undoMenuItem
             // 
             this.undoMenuItem.Name = "undoMenuItem";
-            this.undoMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.undoMenuItem.Size = new System.Drawing.Size(158, 34);
             this.undoMenuItem.Text = "Undo";
             this.undoMenuItem.Click += new System.EventHandler(this.UndoTextChangesToolStripMenuItem_Click);
             // 
             // redoMenuItem
             // 
             this.redoMenuItem.Name = "redoMenuItem";
-            this.redoMenuItem.Size = new System.Drawing.Size(270, 34);
+            this.redoMenuItem.Size = new System.Drawing.Size(158, 34);
             this.redoMenuItem.Text = "Redo";
             this.redoMenuItem.Click += new System.EventHandler(this.RedoToolStripMenuItem_Click);
             // 
@@ -123,6 +153,14 @@
             this.changeBackgroundColorToolStripMenuItem.Size = new System.Drawing.Size(320, 34);
             this.changeBackgroundColorToolStripMenuItem.Text = "Change background color";
             this.changeBackgroundColorToolStripMenuItem.Click += new System.EventHandler(this.ChangeBackgroundColorToolStripMenuItem_Click);
+            // 
+            // openFileDialog1
+            // 
+            this.openFileDialog1.Filter = "XML Files (*.xml)|*.xml";
+            // 
+            // saveFileDialog1
+            // 
+            this.saveFileDialog1.Filter = "XML Files (*.xml)|*.xml";
             // 
             // Form1
             // 
@@ -155,5 +193,10 @@
         private ToolStripMenuItem redoMenuItem;
         private ToolStripMenuItem changeBackgroundColorToolStripMenuItem;
         private ColorDialog colorDialog1;
+        private ToolStripMenuItem saveSpreadsheetToolStripMenuItem;
+        private ToolStripMenuItem loadSpreadsheetToolStripMenuItem;
+        private OpenFileDialog openFileDialog1;
+        private SaveFileDialog saveFileDialog1;
+        private ToolStripMenuItem clearSpreadsheetToolStripMenuItem;
     }
 }
