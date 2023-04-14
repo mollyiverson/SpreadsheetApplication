@@ -2,9 +2,15 @@
 
 <spreadsheet>
 	<cell unusedattr="abc" name='B1'>
-		<text>=A1+6</text>
+		<text>hello</text>
 		<some_tag_you_didnt_write>blah</some_tag_you_didnt_write>
-		<bgcolor>FF8000</bgcolor>
+		<bgcolor>FFFF80C0</bgcolor>
+		<another_unused_tag>data</another_unused_tag>
+	</cell>
+	<cell name='A1'>
+		<bgcolor>FF8000FF</bgcolor>
+		<text>=8</text>
+		<some_tag_you_didnt_write>blah</some_tag_you_didnt_write>
 		<another_unused_tag>data</another_unused_tag>
 	</cell>
 </spreadsheet>

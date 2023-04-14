@@ -318,10 +318,6 @@ namespace Spreadsheet_Molly_Iverson
 
             if (this.openFileDialog1.ShowDialog() == DialogResult.OK)
             {
-                this.spreadsheet.ClearRedoStack();
-                this.spreadsheet.ClearUndoStack();
-                this.spreadsheet.ClearSpreadsheet();
-
                 Stream fileStream = this.openFileDialog1.OpenFile();
                 this.spreadsheet.LoadFromXML(fileStream);
                 fileStream.Close();

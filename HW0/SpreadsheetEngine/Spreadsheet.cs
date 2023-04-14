@@ -274,6 +274,10 @@ namespace SpreadsheetEngine
         /// <param name="stream">The XML file.</param>
         public void LoadFromXML(Stream stream)
         {
+            this.ClearRedoStack();
+            this.ClearUndoStack();
+            this.ClearSpreadsheet();
+
             XmlReaderSettings settings = new XmlReaderSettings()
             {
                 IgnoreWhitespace = true,
