@@ -309,7 +309,11 @@ namespace SpreadsheetEngine
                                         reader.Read();
                                         string text = reader.Value;
                                         newCell.Text = text;
-                                        reader.Read();
+                                        if (text != string.Empty)
+                                        {
+                                            reader.Read();
+                                        }
+
                                         reader.Read();
                                     }
 
