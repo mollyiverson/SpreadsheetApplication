@@ -5,10 +5,15 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
+using System.Reflection.Metadata;
 using System.Text;
 using System.Threading.Tasks;
+using System.Xml;
+using static System.Net.Mime.MediaTypeNames;
+using static System.Runtime.InteropServices.JavaScript.JSType;
 
 namespace SpreadsheetEngine
 {
@@ -261,6 +266,74 @@ namespace SpreadsheetEngine
         public void ClearUndoStack()
         {
             this.undoStack.Clear();
+        }
+
+        /// <summary>
+        /// Loads an XML file and converts the data to a new spreasheet.
+        /// </summary>
+        /// <param name="stream">The XML file.</param>
+        public void LoadFromXML(Stream stream)
+        {
+            XmlReaderSettings settings = new XmlReaderSettings()
+            {
+                IgnoreWhitespace = true,
+                IgnoreComments = true,
+            };
+
+            XmlReader reader = XmlReader.Create(stream, settings);
+
+            while (reader.Read())
+            {
+                if (reader.NodeType == XmlNodeType.Element)
+                {
+                    // if it is a cell, read its data
+                    if (reader.Name == "cell")
+                    {
+                        string? cellName = reader.GetAttribute("name");
+                        if (cellName != null)
+                        {
+                            Cell? newCell = this.GetCell(cellName);
+
+                            if (newCell != null)
+                            {
+                                reader.Read();
+                                while (reader.ReadState != ReadState.EndOfFile && reader.Name != "cell")
+                                {
+                                    // Read the text element
+                                    if (reader.Name == "text")
+                                    {
+                                        reader.Read();
+                                        string text = reader.Value;
+                                        newCell.Text = text;
+                                        reader.Read();
+                                        reader.Read();
+                                    }
+
+                                    // Read the color element
+                                    else if (reader.Name == "bgcolor")
+                                    {
+                                        string color = reader.ReadElementContentAsString();
+                                        uint result = Convert.ToUInt32(color, 16);
+                                        newCell.Color = result;
+                                    }
+                                    else
+                                    {
+                                        reader.Read();
+                                    }
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+
+        /// <summary>
+        /// Saves the spreadsheet data into an XML file.
+        /// </summary>
+        /// <param name="stream">The file to be saved to.</param>
+        public void SaveToXML(Stream stream)
+        {
         }
 
         /// <summary>

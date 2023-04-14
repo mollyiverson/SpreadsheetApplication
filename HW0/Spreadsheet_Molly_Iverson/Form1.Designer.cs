@@ -32,14 +32,16 @@
             this.button1 = new System.Windows.Forms.Button();
             this.menuStrip1 = new System.Windows.Forms.MenuStrip();
             this.fileOption = new System.Windows.Forms.ToolStripMenuItem();
+            this.saveSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.loadSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.editOption = new System.Windows.Forms.ToolStripMenuItem();
             this.undoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.redoMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.cellOption = new System.Windows.Forms.ToolStripMenuItem();
             this.changeBackgroundColorToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
             this.colorDialog1 = new System.Windows.Forms.ColorDialog();
-            this.saveSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
-            this.loadSpreadsheetToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+            this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
+            this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             ((System.ComponentModel.ISupportInitialize)(this.dataGridView1)).BeginInit();
             this.menuStrip1.SuspendLayout();
             this.SuspendLayout();
@@ -91,6 +93,20 @@
             this.fileOption.Size = new System.Drawing.Size(54, 29);
             this.fileOption.Text = "File";
             // 
+            // saveSpreadsheetToolStripMenuItem
+            // 
+            this.saveSpreadsheetToolStripMenuItem.Name = "saveSpreadsheetToolStripMenuItem";
+            this.saveSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(254, 34);
+            this.saveSpreadsheetToolStripMenuItem.Text = "Save spreadsheet";
+            this.saveSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.SaveSpreadsheet_Click);
+            // 
+            // loadSpreadsheetToolStripMenuItem
+            // 
+            this.loadSpreadsheetToolStripMenuItem.Name = "loadSpreadsheetToolStripMenuItem";
+            this.loadSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(254, 34);
+            this.loadSpreadsheetToolStripMenuItem.Text = "Load spreadsheet";
+            this.loadSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.LoadSpreadsheet_Click);
+            // 
             // editOption
             // 
             this.editOption.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
@@ -129,19 +145,13 @@
             this.changeBackgroundColorToolStripMenuItem.Text = "Change background color";
             this.changeBackgroundColorToolStripMenuItem.Click += new System.EventHandler(this.ChangeBackgroundColorToolStripMenuItem_Click);
             // 
-            // saveSpreadsheetToolStripMenuItem
+            // openFileDialog1
             // 
-            this.saveSpreadsheetToolStripMenuItem.Name = "saveSpreadsheetToolStripMenuItem";
-            this.saveSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.saveSpreadsheetToolStripMenuItem.Text = "Save spreadsheet";
-            this.saveSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.SaveSpreadsheet_Click);
+            this.openFileDialog1.Filter = "XML Files (*.xml)|*.xml";
             // 
-            // loadSpreadsheetToolStripMenuItem
+            // saveFileDialog1
             // 
-            this.loadSpreadsheetToolStripMenuItem.Name = "loadSpreadsheetToolStripMenuItem";
-            this.loadSpreadsheetToolStripMenuItem.Size = new System.Drawing.Size(270, 34);
-            this.loadSpreadsheetToolStripMenuItem.Text = "Load spreadsheet";
-            this.loadSpreadsheetToolStripMenuItem.Click += new System.EventHandler(this.LoadSpreadsheet_Click);
+            this.saveFileDialog1.Filter = "\"XML Files (*.xml)|*.xml\"";
             // 
             // Form1
             // 
@@ -176,5 +186,7 @@
         private ColorDialog colorDialog1;
         private ToolStripMenuItem saveSpreadsheetToolStripMenuItem;
         private ToolStripMenuItem loadSpreadsheetToolStripMenuItem;
+        private OpenFileDialog openFileDialog1;
+        private SaveFileDialog saveFileDialog1;
     }
 }

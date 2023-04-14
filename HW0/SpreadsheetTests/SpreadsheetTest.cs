@@ -356,7 +356,7 @@ namespace SpreadsheetApplicationTests
             Cell? cell = spreadsheet.GetCell(1, 1);
             if (cell != null)
             {
-                // Load SpreadsheetData.xml
+                // Load ExtraTags.xml
                 Assert.That(cell.Text, Is.EqualTo("=A1+6"));
             }
             else

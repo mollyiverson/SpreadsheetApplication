@@ -65,6 +65,7 @@ namespace Spreadsheet_Molly_Iverson
                 }
                 else if (e.PropertyName == "Color")
                 {
+                    Color x = Color.FromArgb((int)currentCell.Color);
                     this.dataGridView1.Rows[row].Cells[column].Style.BackColor = Color.FromArgb((int)currentCell.Color);
                 }
             }
@@ -292,7 +293,18 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">The save button is pressed.</param>
         private void SaveSpreadsheet_Click(object sender, EventArgs e)
         {
+            Stream fileStream;
+            this.saveFileDialog1.InitialDirectory = AppContext.BaseDirectory;
 
+            // this.saveFileDialog1.InitialDirectory = AppContext.BaseDirectory;
+            if (this.saveFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                if ((fileStream = this.saveFileDialog1.OpenFile()) != null)
+                {
+                    this.spreadsheet.SaveToXML(fileStream);
+                    fileStream.Close();
+                }
+            }
         }
 
         /// <summary>
@@ -302,9 +314,18 @@ namespace Spreadsheet_Molly_Iverson
         /// <param name="e">The load button is pressed.</param>
         private void LoadSpreadsheet_Click(object sender, EventArgs e)
         {
-            this.spreadsheet.ClearSpreadsheet();
-            this.spreadsheet.ClearUndoStack();
-            this.spreadsheet.ClearRedoStack();
+            this.openFileDialog1.InitialDirectory = AppContext.BaseDirectory;
+
+            if (this.openFileDialog1.ShowDialog() == DialogResult.OK)
+            {
+                this.spreadsheet.ClearRedoStack();
+                this.spreadsheet.ClearUndoStack();
+                this.spreadsheet.ClearSpreadsheet();
+
+                Stream fileStream = this.openFileDialog1.OpenFile();
+                this.spreadsheet.LoadFromXML(fileStream);
+                fileStream.Close();
+            }
         }
     }
 }
