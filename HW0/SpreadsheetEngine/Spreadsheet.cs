@@ -433,7 +433,8 @@ namespace SpreadsheetEngine
                 }
                 catch (System.FormatException)
                 {
-                    throw new Exception("Cannot reference an empty cell.");
+                    // referencing an empty cell returns 0
+                    return 0;
                 }
             }
         }
@@ -468,7 +469,14 @@ namespace SpreadsheetEngine
                             {
                                 currentCell.DependentCells.Add(cell);
                                 currentCell.Subscribe();
-                                currentCell.Value = cell.Value;
+                                if (cell.Value == string.Empty || cell.Value == null)
+                                {
+                                    currentCell.Value = "0";
+                                }
+                                else
+                                {
+                                    currentCell.Value = cell.Value;
+                                }
                             }
                         }
                         else
@@ -526,7 +534,14 @@ namespace SpreadsheetEngine
 
                         if (cell != null)
                         {
-                            currentCell.Value = cell.Value;
+                            if (cell.Value == string.Empty || cell.Value == null)
+                            {
+                                currentCell.Value = "0";
+                            }
+                            else
+                            {
+                                currentCell.Value = cell.Value;
+                            }
                         }
                     }
                     else
@@ -731,14 +746,7 @@ namespace SpreadsheetEngine
                 {
                     if (sender is Cell currentCell)
                     {
-                        if (currentCell.Value == string.Empty || currentCell.Value == null)
-                        {
-                            this.Value = string.Empty;
-                        }
-                        else
-                        {
-                            this.DependentCellPropertyChanged.Invoke(this, new EventArgs());
-                        }
+                        this.DependentCellPropertyChanged.Invoke(this, new EventArgs());
                     }
                 }
             }
