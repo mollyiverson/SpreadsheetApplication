@@ -467,15 +467,22 @@ namespace SpreadsheetEngine
                             Cell? cell = this.GetCell(cellText.Substring(1));
                             if (cell != null)
                             {
-                                currentCell.DependentCells.Add(cell);
-                                currentCell.Subscribe();
-                                if (cell.Value == string.Empty || cell.Value == null)
+                                if (cell == currentCell)
                                 {
-                                    currentCell.Value = "0";
+                                    currentCell.Value = "!(self reference)";
                                 }
                                 else
                                 {
-                                    currentCell.Value = cell.Value;
+                                    currentCell.DependentCells.Add(cell);
+                                    currentCell.Subscribe();
+                                    if (cell.Value == string.Empty || cell.Value == null)
+                                    {
+                                        currentCell.Value = "0";
+                                    }
+                                    else
+                                    {
+                                        currentCell.Value = cell.Value;
+                                    }
                                 }
                             }
                         }
