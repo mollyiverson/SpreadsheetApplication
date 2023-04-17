@@ -127,7 +127,7 @@ namespace SpreadsheetApplicationTests
                 cell2.Text = "=B2";
                 Assert.Multiple(() =>
                 {
-                    Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                    Assert.That(cell2.Value, Is.EqualTo("0"));
                     Assert.That(cell2.Text, Is.EqualTo("=B2")); // Text should not change
                 });
             }
@@ -203,7 +203,7 @@ namespace SpreadsheetApplicationTests
                 cell2.Text = "=B2 + 1";
                 Assert.Multiple(() =>
                 {
-                    Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                    Assert.That(cell2.Value, Is.EqualTo("1"));
                     Assert.That(cell2.Text, Is.EqualTo("=B2 + 1")); // Text should not change
                 });
             }
@@ -397,6 +397,88 @@ namespace SpreadsheetApplicationTests
                     Assert.That(cell1.Color, Is.EqualTo(Convert.ToUInt32("FFFF80C0", 16)));
                     Assert.That(cell2.Text, Is.EqualTo("=8"));
                     Assert.That(cell2.Color, Is.EqualTo(Convert.ToUInt32("FF8000FF", 16)));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests whether referencing a cell to itself sets the value to an error message.
+        /// </summary>
+        [Test]
+        public void TestSelfReference()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Text = "=A1";
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("!(self reference)"));
+                    Assert.That(cell.Text, Is.EqualTo("=A1"));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests a circular reference other referencing to one cell rather than cells in a formula.
+        /// </summary>
+        [Test]
+        public void TestCircularReferenceOneCell()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            Cell? cell2 = spreadsheet.GetCell(2, 2);
+            if (cell != null && cell2 != null)
+            {
+                cell.Text = "=B2";
+                cell2.Text = "=A1";
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("0"));
+                    Assert.That(cell.Text, Is.EqualTo("=B2"));
+                    Assert.That(cell2.Value, Is.EqualTo("!(circular reference)"));
+                    Assert.That(cell2.Text, Is.EqualTo("=A1"));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests a circular reference using complicated expressions.
+        /// </summary>
+        [Test]
+        public void TestCircularReferenceFormula()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            Cell? cell2 = spreadsheet.GetCell(2, 2);
+            Cell? cell3 = spreadsheet.GetCell(3, 3);
+            if (cell != null && cell2 != null && cell3 != null)
+            {
+                cell2.Text = "3";
+                cell3.Text = "55";
+                cell.Text = "=B2 + C3";
+                cell2.Text = "=A1*2";
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("58"));
+                    Assert.That(cell.Text, Is.EqualTo("=B2 + C3"));
+                    Assert.That(cell2.Value, Is.EqualTo("!(circular reference)"));
+                    Assert.That(cell2.Text, Is.EqualTo("=A1*2"));
+                    Assert.That(cell3.Value, Is.EqualTo("55"));
+                    Assert.That(cell3.Text, Is.EqualTo("55"));
                 });
             }
             else
