@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -529,6 +530,7 @@ namespace SpreadsheetEngine
             if (sender is SCell currentCell)
             {
                 string cellText = currentCell.Text;
+                currentCell.ClearList();
                 if (cellText[0] != '=')
                 {
                     currentCell.Value = cellText;
@@ -541,6 +543,9 @@ namespace SpreadsheetEngine
 
                         if (cell != null)
                         {
+                            currentCell.DependentCells.Add(cell);
+                            currentCell.Subscribe();
+
                             if (cell.Value == string.Empty || cell.Value == null)
                             {
                                 currentCell.Value = "0";
@@ -619,6 +624,11 @@ namespace SpreadsheetEngine
             private List<Cell> dependentCells;
 
             /// <summary>
+            /// Indicates whether the cell value has just been changed.
+            /// </summary>
+            private bool valueJustChanged;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="SCell"/> class.
             /// </summary>
             /// <param name="rowIndex">The row index of the cell.</param>
@@ -627,6 +637,7 @@ namespace SpreadsheetEngine
                 : base(rowIndex, columnIndex)
             {
                 this.dependentCells = new List<Cell>();
+                this.valueJustChanged = false;
             }
 
             /// <summary>
@@ -644,6 +655,15 @@ namespace SpreadsheetEngine
             }
 
             /// <summary>
+            /// Gets or sets a value indicating whether the cell has just been changed.
+            /// </summary>
+            public bool ValueJustChanged
+            {
+                get { return this.valueJustChanged; }
+                set { this.valueJustChanged = value; }
+            }
+
+            /// <summary>
             /// Gets or sets the evaluated value of the Cell.
             /// </summary>
             public new string Value
@@ -655,13 +675,25 @@ namespace SpreadsheetEngine
 
                 set
                 {
-                    if (this.value == value)
+                    if (this.valueJustChanged)
                     {
-                        return;
+                        this.value = "!(circular reference)";
+                        this.valueJustChanged = false;
                     }
+                    else
+                    {
+                        if (this.value == value)
+                        {
+                            this.OnCellChangedReferencedCells(new PropertyChangedEventArgs("Value"));
+                            return;
+                        }
 
-                    this.value = value;
-                    base.OnCellChanged(new PropertyChangedEventArgs("Value"));
+                        this.value = value;
+                        this.valueJustChanged = true;
+                        this.OnCellChangedReferencedCells(new PropertyChangedEventArgs("Value"));
+                        base.OnCellChanged(new PropertyChangedEventArgs("Value"));
+                        this.valueJustChanged = false;
+                    }
                 }
             }
 
@@ -716,7 +748,7 @@ namespace SpreadsheetEngine
             {
                 foreach (var cell in this.dependentCells)
                 {
-                    cell.PropertyChanged += this.OtherCell_PropertyChanged;
+                    cell.PropertyChangedForDependents += this.OtherCell_PropertyChanged;
                 }
             }
 
@@ -727,7 +759,7 @@ namespace SpreadsheetEngine
             {
                 foreach (var cell in this.dependentCells)
                 {
-                    cell.PropertyChanged -= this.OtherCell_PropertyChanged;
+                    cell.PropertyChangedForDependents -= this.OtherCell_PropertyChanged;
                 }
 
                 this.dependentCells.Clear();

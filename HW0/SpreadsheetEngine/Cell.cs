@@ -57,6 +57,11 @@ namespace SpreadsheetEngine
         public event PropertyChangedEventHandler? PropertyChanged = delegate { };
 
         /// <summary>
+        /// This event specifically notifies referenced cells that the value of a cell has changed.
+        /// </summary>
+        public event PropertyChangedEventHandler? PropertyChangedForDependents = delegate { };
+
+        /// <summary>
         /// Gets the row index.
         /// </summary>
         public int RowIndex
@@ -127,6 +132,16 @@ namespace SpreadsheetEngine
         {
             // Safely raise the event for all subscribers
             this.PropertyChanged?.Invoke(this, e);
+        }
+
+        /// <summary>
+        /// Notifies that the Value of a Cell has changed.This version is for notified referenced cells in the expression.
+        /// </summary>
+        /// <param name="e">The event of either the Text of Value of a cell changing.</param>
+        protected virtual void OnCellChangedReferencedCells(PropertyChangedEventArgs e)
+        {
+            // Safely raise the event for all subscribers
+            this.PropertyChangedForDependents?.Invoke(this, e);
         }
     }
 }

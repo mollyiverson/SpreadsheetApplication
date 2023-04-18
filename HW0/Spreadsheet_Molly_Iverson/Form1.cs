@@ -322,6 +322,18 @@ namespace Spreadsheet_Molly_Iverson
                 this.spreadsheet.LoadFromXML(fileStream);
                 fileStream.Close();
             }
+
+            if (this.spreadsheet.GetRedoStackSize() == 0 && this.spreadsheet.GetUndoStackSize() == 0)
+            {
+                this.redoMenuItem.Enabled = false;
+                this.redoMenuItem.Text = "Redo";
+                this.undoMenuItem.Enabled = false;
+                this.undoMenuItem.Text = "Undo";
+            }
+            else
+            {
+                throw new Exception("Undo and redo stack should have been cleared.");
+            }
         }
 
         /// <summary>
