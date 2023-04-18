@@ -495,15 +495,29 @@ namespace SpreadsheetEngine
                             {
                                 double value = this.expressionTree.Evaluate();
                                 currentCell.DependentCells = this.GetDependentCells();
-                                currentCell.Subscribe();
-                                currentCell.Value = value + string.Empty;
+                                if (currentCell.DependentCells.Contains(currentCell))
+                                {
+                                    currentCell.Value = "!(self reference)";
+                                }
+                                else
+                                {
+                                    currentCell.Subscribe();
+                                    currentCell.Value = value + string.Empty;
+                                }
                             }
                             catch
                             {
                                 // a nonempty/nonvalid cell is referenced
                                 currentCell.DependentCells = this.GetDependentCells();
-                                currentCell.Subscribe();
-                                currentCell.Value = string.Empty;
+                                if (currentCell.DependentCells.Contains(currentCell))
+                                {
+                                    currentCell.Value = "!(self reference)";
+                                }
+                                else
+                                {
+                                    currentCell.Subscribe();
+                                    currentCell.Value = string.Empty;
+                                }
                             }
                         }
                     }
