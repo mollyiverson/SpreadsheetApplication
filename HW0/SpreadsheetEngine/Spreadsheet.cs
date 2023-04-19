@@ -9,6 +9,7 @@ using System.Drawing;
 using System.Linq;
 using System.Linq.Expressions;
 using System.Reflection.Metadata;
+using System.Runtime.InteropServices;
 using System.Text;
 using System.Threading.Tasks;
 using System.Xml;
@@ -112,6 +113,9 @@ namespace SpreadsheetEngine
                     this.cellArray[i, j].ClearList();
                 }
             }
+
+            this.ClearRedoStack();
+            this.ClearUndoStack();
         }
 
         /// <summary>
@@ -123,7 +127,7 @@ namespace SpreadsheetEngine
         /// <returns>A cell in the spreadsheet.</returns>
         public Cell? GetCell(int row, int column)
         {
-            if (row >= this.RowCount || column >= this.ColumnCount)
+            if (row >= this.RowCount || column >= this.ColumnCount || row < 0 || column < 0)
             {
                 return null;
             }
@@ -351,6 +355,7 @@ namespace SpreadsheetEngine
                 {
                     if (cell.HasCellBeenChanged())
                     {
+                        // if cell isn't default
                         writer.WriteStartElement("cell");
 
                         int row = cell.RowIndex;
@@ -399,7 +404,7 @@ namespace SpreadsheetEngine
                 }
                 else
                 {
-                    return null;
+                    throw new Exception("Variable not compatible with Spreadsheet (Columns A-Z, rows 1-50)");
                 }
             }
             catch
@@ -418,23 +423,33 @@ namespace SpreadsheetEngine
         /// <exception cref="Exception">Throws an exception if GetCell is called with out of range data.</exception>
         private double GetCellValueFromName(string cellName)
         {
-            Cell? currentCell = this.GetCell(cellName);
-            if (currentCell == null)
+            try
             {
-                throw new Exception("GetCell: requesting a cell out of range.");
+                Cell? currentCell = this.GetCell(cellName);
+
+                if (currentCell == null)
+                {
+                    throw new Exception("GetCell: requesting a cell out of range.");
+                }
+                else
+                {
+                    string cellValue = currentCell.Value;
+                    try
+                    {
+                        double answer = Convert.ToDouble(cellValue);
+                        return answer;
+                    }
+                    catch (System.FormatException)
+                    {
+                        // referencing an empty cell returns 0
+                        return 0;
+                    }
+                }
             }
-            else
+            catch
             {
-                string cellValue = currentCell.Value;
-                try
-                {
-                    double answer = Convert.ToDouble(cellValue);
-                    return answer;
-                }
-                catch (System.FormatException)
-                {
-                    throw new Exception("Cannot reference an empty cell.");
-                }
+                // invalid cell -> bad reference error
+                return 0;
             }
         }
 
@@ -457,43 +472,55 @@ namespace SpreadsheetEngine
                     }
                     else if (cellText[0] != '=')
                     {
+                        // simple assignment to a constant or a string
                         currentCell.Value = cellText;
                     }
                     else
                     {
-                        if (this.IsOnlyCellReference(cellText))
+                        // longer expressions with or without cells
+                        string expression = cellText.Substring(1);
+                        this.expressionTree.Expression = expression;
+                        try
                         {
-                            Cell? cell = this.GetCell(cellText.Substring(1));
-                            if (cell != null)
+                            double value = this.expressionTree.Evaluate(); // throws ArgumentNullException if an invalid cell is referenced
+                            currentCell.DependentCells = this.GetDependentCells();
+
+                            // one of the cells in the expression is itself
+                            if (currentCell.DependentCells.Contains(currentCell))
                             {
-                                currentCell.DependentCells.Add(cell);
-                                currentCell.Subscribe();
-                                currentCell.Value = cell.Value;
+                                currentCell.ClearList();
+                                currentCell.SetSelfReference(cellText);
+                                this.CellPropertyChanged(sender, new PropertyChangedEventArgs("Value"));
                             }
-                        }
-                        else
-                        {
-                            string expression = cellText.Substring(1);
-                            this.expressionTree.Expression = expression;
-                            try
+                            else
                             {
-                                double value = this.expressionTree.Evaluate();
-                                currentCell.DependentCells = this.GetDependentCells();
                                 currentCell.Subscribe();
                                 currentCell.Value = value + string.Empty;
                             }
-                            catch
-                            {
-                                // a nonempty/nonvalid cell is referenced
-                                currentCell.DependentCells = this.GetDependentCells();
-                                currentCell.Subscribe();
-                                currentCell.Value = string.Empty;
-                            }
+                        }
+                        catch
+                        {
+                            // a nonempty/nonvalid cell is referenced
+                            currentCell.SetBadReference(cellText);
+                            this.CellPropertyChanged(sender, new PropertyChangedEventArgs("Value"));
                         }
                     }
                 }
                 else if (e.PropertyName == "Value")
                 {
+                    if (currentCell.Value == "!(circular reference)")
+                    {
+                        // When checking for circular references, the variables in the chain changed values.
+                        // This resets the variables to their previous values.
+                        if (this.undoStack.Count > 0)
+                        {
+                            ICommand lastCommand = this.undoStack.Peek();
+                            string oldText = currentCell.Text;
+                            lastCommand.UnExecute();
+                            currentCell.SetCircularReference(oldText);
+                        }
+                    }
+
                     this.CellPropertyChanged(sender, e);
                 }
                 else if (e.PropertyName == "Color")
@@ -514,75 +541,31 @@ namespace SpreadsheetEngine
             if (sender is SCell currentCell)
             {
                 string cellText = currentCell.Text;
+                currentCell.ClearList();
                 if (cellText[0] != '=')
                 {
+                    // simple constant or string assignment
                     currentCell.Value = cellText;
                 }
                 else
                 {
-                    if (this.IsOnlyCellReference(cellText))
+                    // expressions
+                    string expression = cellText.Substring(1);
+                    this.expressionTree.Expression = expression;
+                    try
                     {
-                        Cell? cell = this.GetCell(cellText.Substring(1));
-
-                        if (cell != null)
-                        {
-                            currentCell.Value = cell.Value;
-                        }
+                        double value = this.expressionTree.Evaluate(); // Can throw an ArgumentNullException if an invalid cell is referenced
+                        currentCell.DependentCells = this.GetDependentCells();
+                        currentCell.Subscribe();
+                        currentCell.Value = value + string.Empty;
                     }
-                    else
+                    catch
                     {
-                        string expression = cellText.Substring(1);
-                        this.expressionTree.Expression = expression;
-                        try
-                        {
-                            double value = this.expressionTree.Evaluate();
-                            currentCell.DependentCells = this.GetDependentCells();
-                            currentCell.Subscribe();
-                            currentCell.Value = value + string.Empty;
-                        }
-                        catch
-                        {
-                            // a nonempty/nonvalid cell is referenced
-                            currentCell.DependentCells = this.GetDependentCells();
-                            currentCell.Subscribe();
-                            currentCell.Value = string.Empty;
-                        }
+                        // This error should never be reached because invalid cell checks are done when the cell is initially edited
+                        throw new Exception("Error: The referenced cells shouldn't have issues with invalid cells.");
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns whether an expression is just only a reference to another cell (i.e. "=B2").
-        /// </summary>
-        /// <param name="expression">An expression begining with "=".</param>
-        /// <returns>Whether the expression is only a reference to one cell.</returns>
-        private bool IsOnlyCellReference(string expression)
-        {
-            if (expression.Length >= 3 && expression.Length <= 4 && (expression[0] == '=' && char.IsLetter(expression[1])))
-            {
-                // Get number of rows as a substring
-                string rows = expression.Substring(2);
-
-                int rowIndex;
-
-                // Convert
-                try
-                {
-                    rowIndex = int.Parse(rows) - 1;
-                }
-                catch
-                {
-                    throw new Exception("Variable not compatible with Spreadsheet (Columns A-Z, rows 1-50)");
-                }
-
-                if (rowIndex >= 0 && rowIndex < this.RowCount)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
@@ -597,6 +580,11 @@ namespace SpreadsheetEngine
             private List<Cell> dependentCells;
 
             /// <summary>
+            /// Indicates whether the cell value has just been changed.
+            /// </summary>
+            private bool valueJustChanged;
+
+            /// <summary>
             /// Initializes a new instance of the <see cref="SCell"/> class.
             /// </summary>
             /// <param name="rowIndex">The row index of the cell.</param>
@@ -605,6 +593,7 @@ namespace SpreadsheetEngine
                 : base(rowIndex, columnIndex)
             {
                 this.dependentCells = new List<Cell>();
+                this.valueJustChanged = false;
             }
 
             /// <summary>
@@ -633,13 +622,27 @@ namespace SpreadsheetEngine
 
                 set
                 {
-                    if (this.value == value)
+                    if (this.valueJustChanged)
                     {
-                        return;
+                        this.value = "!(circular reference)";
+                        this.valueJustChanged = false;
                     }
+                    else
+                    {
+                        if (this.value == value)
+                        {
+                            this.valueJustChanged = true;
+                            this.OnCellChangedReferencedCells(new PropertyChangedEventArgs("Value"));
+                            this.valueJustChanged = false;
+                            return;
+                        }
 
-                    this.value = value;
-                    base.OnCellChanged(new PropertyChangedEventArgs("Value"));
+                        this.value = value;
+                        this.valueJustChanged = true;
+                        this.OnCellChangedReferencedCells(new PropertyChangedEventArgs("Value"));
+                        base.OnCellChanged(new PropertyChangedEventArgs("Value"));
+                        this.valueJustChanged = false;
+                    }
                 }
             }
 
@@ -694,7 +697,7 @@ namespace SpreadsheetEngine
             {
                 foreach (var cell in this.dependentCells)
                 {
-                    cell.PropertyChanged += this.OtherCell_PropertyChanged;
+                    cell.PropertyChangedForDependents += this.OtherCell_PropertyChanged;
                 }
             }
 
@@ -705,10 +708,43 @@ namespace SpreadsheetEngine
             {
                 foreach (var cell in this.dependentCells)
                 {
-                    cell.PropertyChanged -= this.OtherCell_PropertyChanged;
+                    cell.PropertyChangedForDependents -= this.OtherCell_PropertyChanged;
                 }
 
                 this.dependentCells.Clear();
+            }
+
+            /// <summary>
+            /// Sets the value of the cell to the circular reference error message without calling
+            /// other cells that reference this cell.
+            /// </summary>
+            /// <param name="oldText">The text of the cell that causes this error.</param>
+            public void SetCircularReference(string oldText)
+            {
+                this.value = "!(circular reference)";
+                this.text = oldText;
+            }
+
+            /// <summary>
+            /// Sets the value of the cell to the self reference error message without calling
+            /// other cells that reference this cell.
+            /// </summary>
+            /// <param name="oldText">The text of the cell that causes this error.</param>
+            public void SetSelfReference(string oldText)
+            {
+                this.value = "!(self reference)";
+                this.text = oldText;
+            }
+
+            /// <summary>
+            /// Sets the value of the cell to the bad reference error message without calling
+            /// other cells that reference this cell.
+            /// </summary>
+            /// <param name="oldText">The text of the cell that causes this error.</param>
+            public void SetBadReference(string oldText)
+            {
+                this.value = "!(bad reference)";
+                this.text = oldText;
             }
 
             /// <summary>
@@ -731,14 +767,7 @@ namespace SpreadsheetEngine
                 {
                     if (sender is Cell currentCell)
                     {
-                        if (currentCell.Value == string.Empty || currentCell.Value == null)
-                        {
-                            this.Value = string.Empty;
-                        }
-                        else
-                        {
-                            this.DependentCellPropertyChanged.Invoke(this, new EventArgs());
-                        }
+                        this.DependentCellPropertyChanged.Invoke(this, new EventArgs());
                     }
                 }
             }

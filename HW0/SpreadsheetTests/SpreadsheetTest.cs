@@ -127,7 +127,7 @@ namespace SpreadsheetApplicationTests
                 cell2.Text = "=B2";
                 Assert.Multiple(() =>
                 {
-                    Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                    Assert.That(cell2.Value, Is.EqualTo("0"));
                     Assert.That(cell2.Text, Is.EqualTo("=B2")); // Text should not change
                 });
             }
@@ -150,7 +150,7 @@ namespace SpreadsheetApplicationTests
                 cell.Text = "=B20"; // out of range. Spreadsheet expects 1-based input
                 Assert.Multiple(() =>
                 {
-                    Assert.That(cell.Value, Is.EqualTo(string.Empty)); // Value should be set to empty string
+                    Assert.That(cell.Value, Is.EqualTo("!(bad reference)"));
                     Assert.That(cell.Text, Is.EqualTo("=B20")); // Text should not change
                 });
             }
@@ -203,7 +203,7 @@ namespace SpreadsheetApplicationTests
                 cell2.Text = "=B2 + 1";
                 Assert.Multiple(() =>
                 {
-                    Assert.That(cell2.Value, Is.EqualTo(string.Empty));
+                    Assert.That(cell2.Value, Is.EqualTo("1"));
                     Assert.That(cell2.Text, Is.EqualTo("=B2 + 1")); // Text should not change
                 });
             }
@@ -397,6 +397,128 @@ namespace SpreadsheetApplicationTests
                     Assert.That(cell1.Color, Is.EqualTo(Convert.ToUInt32("FFFF80C0", 16)));
                     Assert.That(cell2.Text, Is.EqualTo("=8"));
                     Assert.That(cell2.Color, Is.EqualTo(Convert.ToUInt32("FF8000FF", 16)));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests whether referencing a cell to itself sets the value to an error message.
+        /// </summary>
+        [Test]
+        public void TestSelfReference()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            if (cell != null)
+            {
+                cell.Text = "=B2";
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("!(self reference)"));
+                    Assert.That(cell.Text, Is.EqualTo("=B2"));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests a circular reference other referencing to one cell rather than cells in a formula.
+        /// </summary>
+        [Test]
+        public void TestCircularReferenceOneCell()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1);
+            Cell? cell2 = spreadsheet.GetCell(2, 2);
+            if (cell != null && cell2 != null)
+            {
+                cell.Text = "=C3";
+                cell2.Text = "=B2";
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("0"));
+                    Assert.That(cell.Text, Is.EqualTo("=C3"));
+                    Assert.That(cell2.Value, Is.EqualTo("!(circular reference)"));
+                    Assert.That(cell2.Text, Is.EqualTo("=B2"));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests a circular reference using complicated expressions.
+        /// </summary>
+        [Test]
+        public void TestCircularReferenceFormula()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1); // B2
+            Cell? cell2 = spreadsheet.GetCell(2, 2); // C3
+            Cell? cell3 = spreadsheet.GetCell(3, 3); // D4
+            if (cell != null && cell2 != null && cell3 != null)
+            {
+                spreadsheet.AddUndo(cell2, string.Empty, "3"); // Commands must be added to the undo stack because it is used to reset the values when an error is caught
+                cell2.Text = "3";
+                spreadsheet.AddUndo(cell3, string.Empty, "55");
+                cell3.Text = "55";
+                spreadsheet.AddUndo(cell, string.Empty, "=C3 + D4");
+                cell.Text = "=C3 + D4";
+                spreadsheet.AddUndo(cell2, "3", "=B2*2");
+                cell2.Text = "=B2*2";
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("58"));
+                    Assert.That(cell.Text, Is.EqualTo("=C3 + D4"));
+                    Assert.That(cell2.Value, Is.EqualTo("!(circular reference)"));
+                    Assert.That(cell2.Text, Is.EqualTo("=B2*2"));
+                    Assert.That(cell3.Value, Is.EqualTo("55"));
+                    Assert.That(cell3.Text, Is.EqualTo("55"));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
+
+        /// <summary>
+        /// Tests setting a cell to an invalid cell. Bad reference error testing.
+        /// </summary>
+        [Test]
+        public void TestBadReference()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1); // B2
+            Cell? cell2 = spreadsheet.GetCell(2, 2); // C3
+            Cell? cell3 = spreadsheet.GetCell(3, 3); // D4
+            if (cell != null && cell2 != null && cell3 != null)
+            {
+                spreadsheet.AddUndo(cell, string.Empty, "=Z12345");
+                cell.Text = "=Z12345";
+                spreadsheet.AddUndo(cell2, string.Empty, "=Ba");
+                cell2.Text = "=Ba";
+                spreadsheet.AddUndo(cell3, string.Empty, "=Cell");
+                cell3.Text = "=Cell";
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("!(bad reference)"));
+                    Assert.That(cell.Text, Is.EqualTo("=Z12345"));
+                    Assert.That(cell2.Value, Is.EqualTo("!(bad reference)"));
+                    Assert.That(cell2.Text, Is.EqualTo("=Ba"));
+                    Assert.That(cell3.Value, Is.EqualTo("!(bad reference)"));
+                    Assert.That(cell3.Text, Is.EqualTo("=Cell"));
                 });
             }
             else
