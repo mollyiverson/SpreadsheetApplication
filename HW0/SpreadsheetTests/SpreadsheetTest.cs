@@ -150,7 +150,7 @@ namespace SpreadsheetApplicationTests
                 cell.Text = "=B20"; // out of range. Spreadsheet expects 1-based input
                 Assert.Multiple(() =>
                 {
-                    Assert.That(cell.Value, Is.EqualTo(string.Empty)); // Value should be set to empty string
+                    Assert.That(cell.Value, Is.EqualTo("!(bad reference)"));
                     Assert.That(cell.Text, Is.EqualTo("=B20")); // Text should not change
                 });
             }
@@ -504,12 +504,12 @@ namespace SpreadsheetApplicationTests
             Cell? cell3 = spreadsheet.GetCell(3, 3); // D4
             if (cell != null && cell2 != null && cell3 != null)
             {
-                spreadsheet.AddUndo(cell2, string.Empty, "=Z12345");
-                cell2.Text = "=Z12345";
-                spreadsheet.AddUndo(cell3, string.Empty, "=Ba");
-                cell3.Text = "=Ba";
-                spreadsheet.AddUndo(cell, string.Empty, "=Cell");
-                cell.Text = "=Cell";
+                spreadsheet.AddUndo(cell, string.Empty, "=Z12345");
+                cell.Text = "=Z12345";
+                spreadsheet.AddUndo(cell2, string.Empty, "=Ba");
+                cell2.Text = "=Ba";
+                spreadsheet.AddUndo(cell3, string.Empty, "=Cell");
+                cell3.Text = "=Cell";
 
                 Assert.Multiple(() =>
                 {
