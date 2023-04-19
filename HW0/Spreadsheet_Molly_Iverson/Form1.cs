@@ -65,7 +65,6 @@ namespace Spreadsheet_Molly_Iverson
                 }
                 else if (e.PropertyName == "Color")
                 {
-                    Color x = Color.FromArgb((int)currentCell.Color);
                     this.dataGridView1.Rows[row].Cells[column].Style.BackColor = Color.FromArgb((int)currentCell.Color);
                 }
             }
@@ -323,6 +322,7 @@ namespace Spreadsheet_Molly_Iverson
                 fileStream.Close();
             }
 
+            // Redo and Undo stacks are cleared when a new spreadsheet is loaded
             if (this.spreadsheet.GetRedoStackSize() == 0 && this.spreadsheet.GetUndoStackSize() == 0)
             {
                 this.redoMenuItem.Enabled = false;
@@ -344,6 +344,18 @@ namespace Spreadsheet_Molly_Iverson
         private void ClearSpreadsheetToolStripMenuItem_Click(object sender, EventArgs e)
         {
             this.spreadsheet.ClearSpreadsheet();
+
+            if (this.spreadsheet.GetRedoStackSize() == 0 && this.spreadsheet.GetUndoStackSize() == 0)
+            {
+                this.redoMenuItem.Enabled = false;
+                this.redoMenuItem.Text = "Redo";
+                this.undoMenuItem.Enabled = false;
+                this.undoMenuItem.Text = "Undo";
+            }
+            else
+            {
+                throw new Exception("Undo and redo stack should have been cleared.");
+            }
         }
     }
 }

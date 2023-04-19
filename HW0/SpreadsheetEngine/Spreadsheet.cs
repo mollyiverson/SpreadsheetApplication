@@ -113,6 +113,9 @@ namespace SpreadsheetEngine
                     this.cellArray[i, j].ClearList();
                 }
             }
+
+            this.ClearRedoStack();
+            this.ClearUndoStack();
         }
 
         /// <summary>
@@ -352,6 +355,7 @@ namespace SpreadsheetEngine
                 {
                     if (cell.HasCellBeenChanged())
                     {
+                        // if cell isn't default
                         writer.WriteStartElement("cell");
 
                         int row = cell.RowIndex;
@@ -473,7 +477,6 @@ namespace SpreadsheetEngine
                     }
                     else
                     {
-
                         // longer expressions with or without cells
                         string expression = cellText.Substring(1);
                         this.expressionTree.Expression = expression;
@@ -507,6 +510,8 @@ namespace SpreadsheetEngine
                 {
                     if (currentCell.Value == "!(circular reference)")
                     {
+                        // When checking for circular references, the variables in the chain changed values.
+                        // This resets the variables to their previous values.
                         if (this.undoStack.Count > 0)
                         {
                             ICommand lastCommand = this.undoStack.Peek();
@@ -539,10 +544,12 @@ namespace SpreadsheetEngine
                 currentCell.ClearList();
                 if (cellText[0] != '=')
                 {
+                    // simple constant or string assignment
                     currentCell.Value = cellText;
                 }
                 else
                 {
+                    // expressions
                     string expression = cellText.Substring(1);
                     this.expressionTree.Expression = expression;
                     try
@@ -559,39 +566,6 @@ namespace SpreadsheetEngine
                     }
                 }
             }
-        }
-
-        /// <summary>
-        /// Returns whether an expression is just only a reference to another cell (i.e. "=B2").
-        /// </summary>
-        /// <param name="expression">An expression begining with "=".</param>
-        /// <returns>Whether the expression is only a reference to one cell.</returns>
-        private bool IsOnlyCellReference(string expression)
-        {
-            if (expression.Length >= 3 && expression.Length <= 4 && (expression[0] == '=' && char.IsLetter(expression[1])))
-            {
-                // Get number of rows as a substring
-                string rows = expression.Substring(2);
-
-                int rowIndex;
-
-                // Convert
-                try
-                {
-                    rowIndex = int.Parse(rows) - 1;
-                }
-                catch
-                {
-                    throw new Exception("Variable not compatible with Spreadsheet (Columns A-Z, rows 1-50)");
-                }
-
-                if (rowIndex >= 0 && rowIndex < this.RowCount)
-                {
-                    return true;
-                }
-            }
-
-            return false;
         }
 
         /// <summary>
