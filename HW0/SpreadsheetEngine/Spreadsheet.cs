@@ -124,7 +124,7 @@ namespace SpreadsheetEngine
         /// <returns>A cell in the spreadsheet.</returns>
         public Cell? GetCell(int row, int column)
         {
-            if (row >= this.RowCount || column >= this.ColumnCount)
+            if (row >= this.RowCount || column >= this.ColumnCount || row < 0 || column < 0)
             {
                 return null;
             }
@@ -468,6 +468,7 @@ namespace SpreadsheetEngine
                             Cell? cell = this.GetCell(cellText.Substring(1));
                             if (cell != null)
                             {
+                                // self reference
                                 if (cell == currentCell)
                                 {
                                     currentCell.SetSelfReference(currentCell.Text);
@@ -496,6 +497,8 @@ namespace SpreadsheetEngine
                             {
                                 double value = this.expressionTree.Evaluate();
                                 currentCell.DependentCells = this.GetDependentCells();
+
+                                // one of the cells in the expression is itself
                                 if (currentCell.DependentCells.Contains(currentCell))
                                 {
                                     currentCell.ClearList();
@@ -531,12 +534,13 @@ namespace SpreadsheetEngine
                 {
                     if (currentCell.Value == "!(circular reference)")
                     {
-                        ICommand lastCommand = this.undoStack.Peek();
-                        string oldText = currentCell.Text;
-                        lastCommand.UnExecute();
-                        currentCell.SetCircularReference(oldText);
-
-                        // this.undoStack.Push(lastCommand);
+                        if (this.undoStack.Count > 0)
+                        {
+                            ICommand lastCommand = this.undoStack.Peek();
+                            string oldText = currentCell.Text;
+                            lastCommand.UnExecute();
+                            currentCell.SetCircularReference(oldText);
+                        }
                     }
 
                     this.CellPropertyChanged(sender, e);

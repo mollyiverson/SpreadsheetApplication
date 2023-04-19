@@ -415,11 +415,11 @@ namespace SpreadsheetApplicationTests
             Cell? cell = spreadsheet.GetCell(1, 1);
             if (cell != null)
             {
-                cell.Text = "=A1";
+                cell.Text = "=B2";
                 Assert.Multiple(() =>
                 {
                     Assert.That(cell.Value, Is.EqualTo("!(self reference)"));
-                    Assert.That(cell.Text, Is.EqualTo("=A1"));
+                    Assert.That(cell.Text, Is.EqualTo("=B2"));
                 });
             }
             else
@@ -439,14 +439,14 @@ namespace SpreadsheetApplicationTests
             Cell? cell2 = spreadsheet.GetCell(2, 2);
             if (cell != null && cell2 != null)
             {
-                cell.Text = "=B2";
-                cell2.Text = "=A1";
+                cell.Text = "=C3";
+                cell2.Text = "=B2";
                 Assert.Multiple(() =>
                 {
                     Assert.That(cell.Value, Is.EqualTo("0"));
-                    Assert.That(cell.Text, Is.EqualTo("=B2"));
+                    Assert.That(cell.Text, Is.EqualTo("=C3"));
                     Assert.That(cell2.Value, Is.EqualTo("!(circular reference)"));
-                    Assert.That(cell2.Text, Is.EqualTo("=A1"));
+                    Assert.That(cell2.Text, Is.EqualTo("=B2"));
                 });
             }
             else
@@ -462,21 +462,26 @@ namespace SpreadsheetApplicationTests
         public void TestCircularReferenceFormula()
         {
             Spreadsheet spreadsheet = new Spreadsheet(5, 5);
-            Cell? cell = spreadsheet.GetCell(1, 1);
-            Cell? cell2 = spreadsheet.GetCell(2, 2);
-            Cell? cell3 = spreadsheet.GetCell(3, 3);
+            Cell? cell = spreadsheet.GetCell(1, 1); // B2
+            Cell? cell2 = spreadsheet.GetCell(2, 2); // C3
+            Cell? cell3 = spreadsheet.GetCell(3, 3); // D4
             if (cell != null && cell2 != null && cell3 != null)
             {
+                spreadsheet.AddUndo(cell2, string.Empty, "3"); // Commands must be added to the undo stack because it is used to reset the values when an error is caught
                 cell2.Text = "3";
+                spreadsheet.AddUndo(cell3, string.Empty, "55");
                 cell3.Text = "55";
-                cell.Text = "=B2 + C3";
-                cell2.Text = "=A1*2";
+                spreadsheet.AddUndo(cell, string.Empty, "=C3 + D4");
+                cell.Text = "=C3 + D4";
+                spreadsheet.AddUndo(cell2, "3", "=B2*2");
+                cell2.Text = "=B2*2";
+
                 Assert.Multiple(() =>
                 {
                     Assert.That(cell.Value, Is.EqualTo("58"));
-                    Assert.That(cell.Text, Is.EqualTo("=B2 + C3"));
+                    Assert.That(cell.Text, Is.EqualTo("=C3 + D4"));
                     Assert.That(cell2.Value, Is.EqualTo("!(circular reference)"));
-                    Assert.That(cell2.Text, Is.EqualTo("=A1*2"));
+                    Assert.That(cell2.Text, Is.EqualTo("=B2*2"));
                     Assert.That(cell3.Value, Is.EqualTo("55"));
                     Assert.That(cell3.Text, Is.EqualTo("55"));
                 });
