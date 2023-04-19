@@ -491,5 +491,40 @@ namespace SpreadsheetApplicationTests
                 Assert.Fail();
             }
         }
+
+        /// <summary>
+        /// Tests setting a cell to an invalid cell. Bad reference error testing.
+        /// </summary>
+        [Test]
+        public void TestBadReference()
+        {
+            Spreadsheet spreadsheet = new Spreadsheet(5, 5);
+            Cell? cell = spreadsheet.GetCell(1, 1); // B2
+            Cell? cell2 = spreadsheet.GetCell(2, 2); // C3
+            Cell? cell3 = spreadsheet.GetCell(3, 3); // D4
+            if (cell != null && cell2 != null && cell3 != null)
+            {
+                spreadsheet.AddUndo(cell2, string.Empty, "=Z12345");
+                cell2.Text = "=Z12345";
+                spreadsheet.AddUndo(cell3, string.Empty, "=Ba");
+                cell3.Text = "=Ba";
+                spreadsheet.AddUndo(cell, string.Empty, "=Cell");
+                cell.Text = "=Cell";
+
+                Assert.Multiple(() =>
+                {
+                    Assert.That(cell.Value, Is.EqualTo("!(bad reference)"));
+                    Assert.That(cell.Text, Is.EqualTo("=Z12345"));
+                    Assert.That(cell2.Value, Is.EqualTo("!(bad reference)"));
+                    Assert.That(cell2.Text, Is.EqualTo("=Ba"));
+                    Assert.That(cell3.Value, Is.EqualTo("!(bad reference)"));
+                    Assert.That(cell3.Text, Is.EqualTo("=Cell"));
+                });
+            }
+            else
+            {
+                Assert.Fail();
+            }
+        }
     }
 }
