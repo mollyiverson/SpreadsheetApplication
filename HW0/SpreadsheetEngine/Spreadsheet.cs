@@ -470,7 +470,8 @@ namespace SpreadsheetEngine
                             {
                                 if (cell == currentCell)
                                 {
-                                    currentCell.Value = "!(self reference)";
+                                    currentCell.SetSelfReference(currentCell.Text);
+                                    this.CellPropertyChanged(sender, new PropertyChangedEventArgs("Value"));
                                 }
                                 else
                                 {
@@ -497,7 +498,9 @@ namespace SpreadsheetEngine
                                 currentCell.DependentCells = this.GetDependentCells();
                                 if (currentCell.DependentCells.Contains(currentCell))
                                 {
-                                    currentCell.Value = "!(self reference)";
+                                    currentCell.ClearList();
+                                    currentCell.SetSelfReference(currentCell.Text);
+                                    this.CellPropertyChanged(sender, new PropertyChangedEventArgs("Value"));
                                 }
                                 else
                                 {
@@ -511,7 +514,9 @@ namespace SpreadsheetEngine
                                 currentCell.DependentCells = this.GetDependentCells();
                                 if (currentCell.DependentCells.Contains(currentCell))
                                 {
-                                    currentCell.Value = "!(self reference)";
+                                    currentCell.ClearList();
+                                    currentCell.SetSelfReference(currentCell.Text);
+                                    this.CellPropertyChanged(sender, new PropertyChangedEventArgs("Value"));
                                 }
                                 else
                                 {
@@ -524,6 +529,16 @@ namespace SpreadsheetEngine
                 }
                 else if (e.PropertyName == "Value")
                 {
+                    if (currentCell.Value == "!(circular reference)")
+                    {
+                        ICommand lastCommand = this.undoStack.Peek();
+                        string oldText = currentCell.Text;
+                        lastCommand.UnExecute();
+                        currentCell.SetCircularReference(oldText);
+
+                        // this.undoStack.Push(lastCommand);
+                    }
+
                     this.CellPropertyChanged(sender, e);
                 }
                 else if (e.PropertyName == "Color")
@@ -669,15 +684,6 @@ namespace SpreadsheetEngine
             }
 
             /// <summary>
-            /// Gets or sets a value indicating whether the cell has just been changed.
-            /// </summary>
-            public bool ValueJustChanged
-            {
-                get { return this.valueJustChanged; }
-                set { this.valueJustChanged = value; }
-            }
-
-            /// <summary>
             /// Gets or sets the evaluated value of the Cell.
             /// </summary>
             public new string Value
@@ -698,7 +704,9 @@ namespace SpreadsheetEngine
                     {
                         if (this.value == value)
                         {
+                            this.valueJustChanged = true;
                             this.OnCellChangedReferencedCells(new PropertyChangedEventArgs("Value"));
+                            this.valueJustChanged = false;
                             return;
                         }
 
@@ -777,6 +785,28 @@ namespace SpreadsheetEngine
                 }
 
                 this.dependentCells.Clear();
+            }
+
+            /// <summary>
+            /// Sets the value of the cell to the circular reference error message without calling
+            /// other cells that reference this cell.
+            /// </summary>
+            /// <param name="oldText">The text of the cell that causes this error.</param>
+            public void SetCircularReference(string oldText)
+            {
+                this.value = "!(circular reference)";
+                this.text = oldText;
+            }
+
+            /// <summary>
+            /// Sets the value of the cell to the self reference error message without calling
+            /// other cells that reference this cell.
+            /// </summary>
+            /// <param name="oldText">The text of the cell that causes this error.</param>
+            public void SetSelfReference(string oldText)
+            {
+                this.value = "!(self reference)";
+                this.text = oldText;
             }
 
             /// <summary>
