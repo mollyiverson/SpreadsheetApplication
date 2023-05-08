@@ -4,8 +4,8 @@
 
 ## Table of Contents
 1. [Project Description](#project-description)
-2. [Images](#images)
-3. [How to use](#how-to-use)
+2. [How to use](#how-to-use)
+3. [Images](#images)
 4. [Author](#author)
 
 ## Project Description
