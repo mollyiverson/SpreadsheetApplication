@@ -37,6 +37,8 @@ namespace Spreadsheet_Molly_Iverson
 
             this.undoMenuItem.Enabled = false;
             this.redoMenuItem.Enabled = false;
+            this.button1.Enabled = false;
+            this.button1.Visible = false;
         }
 
         /// <summary>
