@@ -12,7 +12,7 @@
 This software program allows users to organize and manipulate data in a tablular format, similar to Excel. It can handle various types of data, including numbers, strings, and expressions. It handles circular, self, and bad references. This spreadsheet application can undo and redo changes, making it easy to correct mistakes and restore previous versions of the data. Additionally, users can color cells to highlight specific information. The application also supports the import and export of XML files, allowing users to transfer data easily.
 
 ## How to use
-Simply clone the repository. To add formulas, put an '=' before the formula (e.g. "=A1+5"). This application supports addition, subtraction, division, and multiplication. It does not support unary operators.
+Simply clone the repository and run Spreadsheet_Molly_Iverson. To add formulas, put an '=' before the formula (e.g. "=A1+5"). This application supports addition, subtraction, division, and multiplication. It does not support unary operators.
 
 ## Images
 
