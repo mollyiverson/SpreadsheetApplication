@@ -1,7 +1,3 @@
-// <copyright file="Form1.cs" company="Molly Iverson:11775649">
-// Copyright (c) Molly Iverson:11775649. All rights reserved.
-// </copyright>
-
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;

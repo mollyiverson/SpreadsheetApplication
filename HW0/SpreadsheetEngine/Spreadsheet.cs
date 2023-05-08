@@ -1,8 +1,4 @@
-﻿// <copyright file="Spreadsheet.cs" company="Molly Iverson:11775649">
-// Copyright (c) Molly Iverson:11775649. All rights reserved.
-// </copyright>
-
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Drawing;
@@ -516,8 +512,12 @@ namespace SpreadsheetEngine
                         {
                             ICommand lastCommand = this.undoStack.Peek();
                             string oldText = currentCell.Text;
+                            List<Cell> dependentCells = currentCell.DependentCells;
+                            List<Cell> copiedList = dependentCells.Select(x => x).ToList();
                             lastCommand.UnExecute();
                             currentCell.SetCircularReference(oldText);
+                            currentCell.DependentCells = copiedList;
+                            currentCell.Subscribe();
                         }
                     }
 

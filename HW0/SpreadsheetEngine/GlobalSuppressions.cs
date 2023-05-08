@@ -1,8 +1,4 @@
-﻿// <copyright file="GlobalSuppressions.cs" company="Molly Iverson:11775649">
-// Copyright (c) Molly Iverson:11775649. All rights reserved.
-// </copyright>
-
-using System.Diagnostics.CodeAnalysis;
+﻿using System.Diagnostics.CodeAnalysis;
 
 [assembly: SuppressMessage("StyleCop.CSharp.MaintainabilityRules", "SA1401:Fields should be private", Justification = "We were told to make our Cell data members protected, not private.", Scope = "member", Target = "~F:SpreadsheetEngine.Cell.columnIndex")]
 

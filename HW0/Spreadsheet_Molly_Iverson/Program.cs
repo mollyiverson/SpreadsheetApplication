@@ -1,7 +1,3 @@
-// <copyright file="Program.cs" company="Molly Iverson:11775649">
-// Copyright (c) Molly Iverson:11775649. All rights reserved.
-// </copyright>
-
 namespace Spreadsheet_Molly_Iverson
 {
     /// <summary>
